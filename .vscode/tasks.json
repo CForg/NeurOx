@@ -1,0 +1,32 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+    
+        {
+            "label": "Run ox",
+            "type": "shell",
+            "command": "C:\\PROGRA~1\\OxMetrics9\\ox\\oxl.exe",
+            "args": [
+                "-i${workspaceFolder}\\include",
+                "${file}"
+            ],
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Make",
+            "type": "shell",
+            "command": "C:\\PROGRA~2\\GnuWin32\\bin\\make.exe",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
