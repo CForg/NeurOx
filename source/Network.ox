@@ -1,5 +1,19 @@
+/** Neural Network.**/
 #include "Network.oxh"
 
+/** Interface to Ox's optimization library.
+@param vW vector of weights and biases
+@param aL address to place -Loss 
+@param aG 0 or address to place Gradient if called for
+@param aH 0 or address to place Hessian if called for
+
+@return 1
+
+Note:  This version does not compute H
+If Network::BACKPROGRATION is TRUE then the gradient is computed uisng Backward()
+Otherwise Num1Derivative() is used to compute numerical gradient
+
+**/
 Lobj(vW,aL,aG,aH) {
 	aL[0] = -net->Obj(vW);	   //convert to maximum
 	if (!isint(aG))	{
@@ -8,35 +22,59 @@ Lobj(vW,aL,aG,aH) {
 			aG[0] = -net.grad;	//Have to negate analytic loss derivative
 			}
 		else {
-			decl tmpDO = LayerDropout::DROPOUT;
-			LayerDropout::DROPOUT=FALSE;
+			decl tmpDO = Layer::DROPOUT;
+			Layer::DROPOUT=FALSE;
 			Num1Derivative(Lobj,vW,aG);
-			LayerDropout::DROPOUT=tmpDO;
+			Layer::DROPOUT=tmpDO;
 			}
 		}
 	return 1;
 	}
 
+/** Objective  function of the network
+@param vW vector of biases aand weights
+@return Loss + penalty
+
+**/
 Network::Obj(vW) {
 	decl l;
-	penalty = 0.0;
-	foreach (l in layers)  {
+	penalty = 0.0;        //initialize penalty
+	foreach (l in layers)  
 		penalty += l->UpdateWeights(vW);
-		}
+
 	Forward();
+
 	return (floss + penalty);  
 	}
+
+/** Base Loss function creator.
+@param target T x M matrix of target data
+**/
 Loss::Loss(target) {
 	this.target = target;
 	}
+
+/** Create a mean squared error loss function.
+@param target T x M matrix of target data
+**/
 MeanSquareError::MeanSquareError(target) {
 	Loss(target);
 	}
+
+/** Compute MSE loss and initialize B.
+$$L = \sum_{t} {(y-\hat y)}^2 / 2.$$
+B initialized as the gradient, (y-\hat y)
+@return L
+**/
 MeanSquareError::value() {
 	B[][] = target-inputs';
 	loss = sumsqrc(B)/2.0;
 	return loss;
 	}
+
+/** Create a CrossEntropy (multinomial logit) loss function".
+@param target T x M matrix of target data
+**/
 CrossEntropy::CrossEntropy(target) {
 	Loss(target);
 	rng = range(0,rows(target)-1);
@@ -44,12 +82,17 @@ CrossEntropy::CrossEntropy(target) {
 	targcol = target.==targcol;
 	range(0,maxc(target)-1);
 	}
+
+/** Compute MSE loss and initialize B.
+
+@return  L  
+**/
 CrossEntropy::value() {
 	vL =selectrc(inputs,rng,target)';
 	B[][] = vL.*(targcol - inputs);
 	if (Network::VOLUME) {
-		decl pred = maxcindex(inputs') ';
-		println("Prediction Rate",meanc(pred.==target));
+		decl pred = maxcindex(inputs');
+		println("Prediction Rate",meanc(pred'.==target));
 		}
 	loss = -sumc(log(vL));
 	B[][] .*= -1.0 ./ vL;
@@ -81,18 +124,18 @@ Network::AddLayers(...args) {
 	foreach (l in args) {
 		if (!isclass(l,"Layer"))
 			oxrunerror("layer has to be a Layer object");
-		if (isclass(l,"LayerDense")) {
+		if (isclass(l,"Dense")) {
 			l.MyW0 = Nweights;
 			Nweights += l.NW;
 			}
-		else if (isclass(l,"LayerDropout")) {
+		else if (isclass(l,"Dropout")) {
 			if (!Nlayers)
 				oxrunerror("First layer should not be Dropout");
 			l.Dims = constant(layers[.last].Dims[Nneurons],1,2);  //pass thru layer
 			println("DROPOUT dims",l.Dims);
 			}
 		if (Nlayers) {
-			if (isclass(l,"LayerDense")
+			if (isclass(l,"Dense")
 				&&  l.Dims[Ninputs]!=layers[.last].Dims[Nneurons])
 				oxrunerror("layer "+sprint(Nlayers)+" should take "+sprint(layers[Nlayers-1].Dims[Nneurons])+" inputs");
 			l.prev = layers[.last];   // double link layers
@@ -108,7 +151,16 @@ Network::AddLayers(...args) {
 		layers[.last].next = 0;  //last layer has no successor until built
 	}
 
-/** Set the batch inputs and target outputs .**/
+/** Set the Loss type, batch inputs and target outputs .
+@param LossType integer code for Loss
+@param batch TxN matrix of training data
+@param target TxM matrix of target outputs
+
+This builds the network and initializes the dimensions of  matrices. 
+The code then reuses these matrices (placing [][] ) to avoid new memory 
+allocation.
+
+**/
 Network::SetBatchAndTarget(LossType,batch,target)	{
 	if (isbuilt)
 		oxrunerror("Network already built");
@@ -131,7 +183,7 @@ Network::SetBatchAndTarget(LossType,batch,target)	{
 	BatchSize = rows(target);
 	Loss.B = zeros(BatchSize,layers[.last].Dims[Nneurons]);
 	foreach (l in layers) {
-		if (isclass(l,"LayerDropout"))
+		if (isclass(l,"Dropout"))
 			l.curdrops = ones(l.inputs);			//l,l.Dims[Nneurons]
 		l.output = zeros(rows(l.inputs),l.Dims[Nneurons]);
 		l.next.inputs = zeros(l.output);
@@ -139,7 +191,8 @@ Network::SetBatchAndTarget(LossType,batch,target)	{
 		}
 	grad = zeros(Nweights,1);
 	}
-	
+
+/**Forward propagate the network.**/	
 Network::Forward() {
 	decl l;
 	foreach ( l in layers ) {
@@ -148,27 +201,27 @@ Network::Forward() {
 		}
 	floss = Loss->value();
 	}
+
 Network::Output() {
 	decl l;
 	foreach ( l in layers ) 
 		println(l.weights);
 	}
 	
-/** Not working yet.**/
+/** Back Propgation .**/
 Network::Backward() {
-	decl l,lastdone = rows(grad);
+	decl l,lastdone;
+	lastdone = rows(grad);	//work backwards in the W matrix
 	l = layers[.last];
 	//gradient of the loss function initializes B for chain rule
 	l.B[][] = Loss.B;
 	while (isclass(l)) {
-//		println("**",l.B[:20][:min(10,.last)]);
-		if (l.NW) {
+		if (l.NW) { // insert new layer gradients in the overall vector
 			grad[lastdone-l.NW:lastdone-1] = l->Backward();
 			lastdone -= l.NW;
 			}
 		else	//Dropout layer
 			l->Backward();
-//		println(l.B[:20][:min(10,.last)]);			
 		l = l.prev;
 		}
 	}
