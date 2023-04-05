@@ -1,0 +1,146 @@
+
+dt {
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+dd.example PRE {
+    background: #eeeeee;
+    border: 1px solid silver;
+    padding: 4px;
+}
+
+tr.even_row {
+    padding: 4px;
+}
+tr.odd_row {
+	border-bottom: 1px solid white;
+    padding: 4px;
+    padding-bottom: 8px;
+}
+
+.indent {
+    padding-left: 40px;
+}
+
+.table_of_contents {
+    border: 1px solid #f0f0f0;
+    width: 100%;
+    margin-top: 8px;
+    border-collapse: collapse;
+    background: #f0f0f0;
+}
+
+.method_table {
+    border: 1px solid #f0f0f0;
+    width: 100%;
+    margin-top: 8px;
+    border-collapse: collapse;
+    background: #f0f0f0;
+}
+
+.method_table .header {
+    text-align: left;
+    font-size: 110%;
+    font-weight: bold;
+    padding: 4px;
+    border-bottom: 1px solid black;
+}
+
+.declaration {
+    font-family: Consolas, Menlo, monospace;
+}
+.function {
+    background: #afeeee;
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+.function_box {
+    border: 1px solid #afeeee;
+	margin: 0px;
+	padding: 0px;
+}
+
+td.description {
+    padding-left: 24px;
+	font-size: 90%;
+}
+td.prefix {
+    text-align: right;
+	vertical-align: top;
+	padding-right: 4px;
+	width: 180px;
+    font-family: Consolas, Menlo, monospace;
+}
+
+.method_table .declaration {
+}
+
+.method_table .description {
+}
+
+.parameter_table .declaration {
+    padding-right: 32px;
+}
+
+.equation {
+    text-align: center;
+    display: block;
+    margin: 4px;
+    font-style: italic;
+    font-family: times;
+    font-size: 120%;
+}
+
+.expression {
+    font-style: italic;
+    font-family: times;
+    font-size: 120%;
+}
+
+.header {
+    text-align: right;
+}
+
+.footer {
+    font-size: 70%;
+    text-align: center;
+    border-top: 1px solid gray;
+    margin-top: 16px;
+    padding-top: 4px;
+}
+
+ul.index {
+    margin-left: 0px; 
+    padding-left: 0px;
+}
+
+.index li {
+    margin-top: 4px;
+    list-style-type: none;
+}
+
+.letter  {
+    margin-top: 4px;
+    list-style-type: none;
+    font-size: 160%;
+    font-weight: bold;
+}
+
+.index li a {
+    text-decoration: none;
+}
+
+.oxcode {
+    font-family: Consolas, Menlo, monospace;
+	background: #E0E0E0;
+}
+
+.comment {
+    font-family: Consolas, Menlo, monospace;
+	color: #008000; 
+}
+.literal {
+    font-family: Consolas, Menlo, monospace;
+	color: #EC0000; 
+}

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="body.css">
+    <link rel="stylesheet" type="text/css" href="oxdoc.css">
+    <link rel="icon" href="oxdoc.png">
+    <title>Network.oxh</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  </head>
+<body>
+<div class="page-frame">
+<div class="header">
+[ <a href="index.html">NeurOx:  Neural Networks in Ox home</a>
+ | <a href="idx.html">Index</a> ]
+</div>
+
+<p><h1>Network.oxh</h1>
+
+
+<!-- BinaryCrossEntropy -->
+<a id="BinaryCrossEntropy"></a>
+<p><h2><a href="Network.oxh.html#BinaryCrossEntropy">BinaryCrossEntropy</a> : <a href="Network.oxh.html#CrossEntropy">CrossEntropy</a> : <a href="Network.oxh.html#Loss">Loss</a> class reference</h2>
+
+<!-- BinaryCrossEntropy function members (public by default) -->
+<p><table class="method_table">
+<tr><td colspan="2" class="header">BinaryCrossEntropy function members (public by default)</td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration"><a href="Network.oxh.html#BinaryCrossEntropy::BinaryCrossEntropy">BinaryCrossEntropy</a>( target)</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration"><a href="Network.oxh.html#BinaryCrossEntropy::value">value</a>()</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+</table>
+
+<!-- CrossEntropy -->
+<a id="CrossEntropy"></a>
+<p><h2><a href="Network.oxh.html#CrossEntropy">CrossEntropy</a> : <a href="Network.oxh.html#Loss">Loss</a> class reference</h2>
+
+<!-- CrossEntropy function members (public by default) -->
+<p><table class="method_table">
+<tr><td colspan="2" class="header">CrossEntropy function members (public by default)</td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration"><a href="Network.oxh.html#CrossEntropy::CrossEntropy">CrossEntropy</a>( target)</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">Create a CrossEntropy (multinomial logit) loss function".</td></tr>
+<tr class="even_row"><td class="prefix">virtual </td><td class="declaration"><a href="Network.oxh.html#CrossEntropy::value">value</a>()</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">Compute MSE loss and initialize B.</td></tr>
+</table>
+
+<!-- CrossEntropy data members (protected by default) -->
+<p><table class="method_table">
+<tr><td colspan="2" class="header">CrossEntropy data members (protected by default)</td></tr>
+<tr class="even_row"><td class="prefix">public:static const </td><td class="declaration"><a href="Network.oxh.html#CrossEntropy::rng">rng</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">public:static const </td><td class="declaration"><a href="Network.oxh.html#CrossEntropy::targcol">targcol</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+</table>
+
+<!-- Loss -->
+<a id="Loss"></a>
+<p><h2><a href="Network.oxh.html#Loss">Loss</a> class reference</h2>
+
+<!-- Loss function members (public by default) -->
+<p><table class="method_table">
+<tr><td colspan="2" class="header">Loss function members (public by default)</td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration"><a href="Network.oxh.html#Loss::Loss">Loss</a>( target)</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">Base Loss function creator.</td></tr>
+<tr class="even_row"><td class="prefix">virtual </td><td class="declaration"><a href="Network.oxh.html#Loss::value">value</a>( aL,  aGrad)</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+</table>
+
+<!-- Loss data members (protected by default) -->
+<p><table class="method_table">
+<tr><td colspan="2" class="header">Loss data members (protected by default)</td></tr>
+<tr class="even_row"><td class="prefix">public:</td><td class="declaration"><a href="Network.oxh.html#Loss::B">B</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">public:</td><td class="declaration"><a href="Network.oxh.html#Loss::inputs">inputs</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">public:</td><td class="declaration"><a href="Network.oxh.html#Loss::loss">loss</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">public:</td><td class="declaration"><a href="Network.oxh.html#Loss::target">target</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">public:</td><td class="declaration"><a href="Network.oxh.html#Loss::vL">vL</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+</table>
+
+<!-- MeanSquareError -->
+<a id="MeanSquareError"></a>
+<p><h2><a href="Network.oxh.html#MeanSquareError">MeanSquareError</a> : <a href="Network.oxh.html#Loss">Loss</a> class reference</h2>
+
+<!-- MeanSquareError function members (public by default) -->
+<p><table class="method_table">
+<tr><td colspan="2" class="header">MeanSquareError function members (public by default)</td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration"><a href="Network.oxh.html#MeanSquareError::MeanSquareError">MeanSquareError</a>( target)</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">Create a mean squared error loss function.</td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration"><a href="Network.oxh.html#MeanSquareError::value">value</a>()</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">Compute MSE loss and initialize B.</td></tr>
+</table>
+
+<!-- Network -->
+<a id="Network"></a>
+<p><h2><a href="Network.oxh.html#Network">Network</a> class reference</h2>
+
+<!-- Network function members (public by default) -->
+<p><table class="method_table">
+<tr><td colspan="2" class="header">Network function members (public by default)</td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration"><a href="Network.oxh.html#Network::AddLayers">AddLayers</a>( ...args)</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">Add layers to the network.</td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration"><a href="Network.oxh.html#Network::Backward">Backward</a>()</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">Back Propgation .</td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration"><a href="Network.oxh.html#Network::CrossEntropy">CrossEntropy</a>()</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration"><a href="Network.oxh.html#Network::Forward">Forward</a>()</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">Forward propagate the network.</td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration"><a href="Network.oxh.html#Network::Network">Network</a>()</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">Create a new empty network.</td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration"><a href="Network.oxh.html#Network::Obj">Obj</a>( vW)</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">Objective  function of the network</td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration"><a href="Network.oxh.html#Network::Output">Output</a>()</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration"><a href="Network.oxh.html#Network::SetBatchAndTarget">SetBatchAndTarget</a>( LossType,  batch,  target)</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">Set the Loss type, batch inputs and target outputs .</td></tr>
+</table>
+
+<!-- Network data members (protected by default) -->
+<p><table class="method_table">
+<tr><td colspan="2" class="header">Network data members (protected by default)</td></tr>
+<tr class="even_row"><td class="prefix">public:static </td><td class="declaration"><a href="Network.oxh.html#Network::BACKPROPAGATION">BACKPROPAGATION</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">public:</td><td class="declaration"><a href="Network.oxh.html#Network::BatchSize">BatchSize</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">public:</td><td class="declaration"><a href="Network.oxh.html#Network::floss">floss</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">public:</td><td class="declaration"><a href="Network.oxh.html#Network::grad">grad</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">public:</td><td class="declaration"><a href="Network.oxh.html#Network::isbuilt">isbuilt</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">public:</td><td class="declaration"><a href="Network.oxh.html#Network::layers">layers</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">public:</td><td class="declaration"><a href="Network.oxh.html#Network::Loss">Loss</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">public:</td><td class="declaration"><a href="Network.oxh.html#Network::Nlayers">Nlayers</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">public:</td><td class="declaration"><a href="Network.oxh.html#Network::Nweights">Nweights</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">public:</td><td class="declaration"><a href="Network.oxh.html#Network::penalty">penalty</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">public:static </td><td class="declaration"><a href="Network.oxh.html#Network::VOLUME">VOLUME</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+</table>
+
+<!-- exported functions -->
+<a id="exported functions"></a>
+<p><h2>exported functions</h2>
+
+<!-- exported functions -->
+<p><table class="method_table">
+<tr><td colspan="2" class="header">exported functions</td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration"><a href="Network.oxh.html#::Lobj">Lobj</a>( v,  aL,  aG,  aH)</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">Loss as objective that can be used by maximize package</td></tr>
+</table>
+
+<!-- exported enumerations -->
+<a id="exported enumerations"></a>
+<p><h2>exported enumerations</h2>
+
+<!-- exported enumerations -->
+<p><table class="method_table">
+<tr><td colspan="2" class="header">exported enumerations</td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration">{BinaryCELoss, CELoss, MSELoss, NLossFunctions}</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+</table>
+<p><a id="BinaryCrossEntropy::BinaryCrossEntropy"></a>
+<div class="function_box">
+<div class="function declaration">BinaryCrossEntropy::BinaryCrossEntropy( target)</div>
+<dl>
+</dl>
+</div>
+<p><a id="BinaryCrossEntropy::value"></a>
+<div class="function_box">
+<div class="function declaration">BinaryCrossEntropy::value()</div>
+<dl>
+</dl>
+</div>
+<p><a id="CrossEntropy::CrossEntropy"></a>
+<div class="function_box">
+<div class="function declaration">CrossEntropy::CrossEntropy( target)</div>
+<dl>
+Create a CrossEntropy (multinomial logit) loss function".
+<dt class="parameters">Parameters</dt><dd class="parameters">
+<table class="parameter_table">
+<tr><td class="parameter">target</td><td class="description"> T x M matrix of target data</td></tr>
+</table>
+</dl>
+</div>
+<p><a id="CrossEntropy::value"></a>
+<div class="function_box">
+<div class="function declaration">virtual CrossEntropy::value()</div>
+<dl>
+Compute MSE loss and initialize B.
+</dl>
+</div>
+<p><a id="Loss::Loss"></a>
+<div class="function_box">
+<div class="function declaration">Loss::Loss( target)</div>
+<dl>
+Base Loss function creator.
+<dt class="parameters">Parameters</dt><dd class="parameters">
+<table class="parameter_table">
+<tr><td class="parameter">target</td><td class="description"> T x M matrix of target data</td></tr>
+</table>
+</dl>
+</div>
+<p><a id="Loss::value"></a>
+<div class="function_box">
+<div class="function declaration">virtual Loss::value( aL,  aGrad)</div>
+<dl>
+</dl>
+</div>
+<p><a id="MeanSquareError::MeanSquareError"></a>
+<div class="function_box">
+<div class="function declaration">MeanSquareError::MeanSquareError( target)</div>
+<dl>
+Create a mean squared error loss function.
+<dt class="parameters">Parameters</dt><dd class="parameters">
+<table class="parameter_table">
+<tr><td class="parameter">target</td><td class="description"> T x M matrix of target data</td></tr>
+</table>
+</dl>
+</div>
+<p><a id="MeanSquareError::value"></a>
+<div class="function_box">
+<div class="function declaration">MeanSquareError::value()</div>
+<dl>
+Compute MSE loss and initialize B.
+$$L = \sum_{t} {(y-\hat y)}^2 / 2.$$
+B initialized as the gradient, (y-\hat y)
+<dt class="returns">Returns</dt><dd class="returns">
+ L
+</dd>
+</dl>
+</div>
+<p><a id="Network::AddLayers"></a>
+<div class="function_box">
+<div class="function declaration">Network::AddLayers( ...args)</div>
+<dl>
+Add layers to the network.
+<dt class="parameters">Parameters</dt><dd class="parameters">
+<table class="parameter_table">
+<tr><td class="parameter">...</td><td class="description"> each argument is a layer object.</td></tr>
+</table>
+</dl>
+</div>
+<p><a id="Network::Backward"></a>
+<div class="function_box">
+<div class="function declaration">Network::Backward()</div>
+<dl>
+Back Propgation .
+</dl>
+</div>
+<p><a id="Network::CrossEntropy"></a>
+<div class="function_box">
+<div class="function declaration">Network::CrossEntropy()</div>
+<dl>
+</dl>
+</div>
+<p><a id="Network::Forward"></a>
+<div class="function_box">
+<div class="function declaration">Network::Forward()</div>
+<dl>
+Forward propagate the network.
+</dl>
+</div>
+<p><a id="Network::Network"></a>
+<div class="function_box">
+<div class="function declaration">Network::Network()</div>
+<dl>
+Create a new empty network.
+</dl>
+</div>
+<p><a id="Network::Obj"></a>
+<div class="function_box">
+<div class="function declaration">Network::Obj( vW)</div>
+<dl>
+Objective  function of the network
+<dt class="parameters">Parameters</dt><dd class="parameters">
+<table class="parameter_table">
+<tr><td class="parameter">vW</td><td class="description"> vector of biases aand weights</td></tr>
+</table>
+</dd>
+<dt class="returns">Returns</dt><dd class="returns">
+ Loss + penalty
+</dd>
+</dl>
+</div>
+<p><a id="Network::Output"></a>
+<div class="function_box">
+<div class="function declaration">Network::Output()</div>
+<dl>
+</dl>
+</div>
+<p><a id="Network::SetBatchAndTarget"></a>
+<div class="function_box">
+<div class="function declaration">Network::SetBatchAndTarget( LossType,  batch,  target)</div>
+<dl>
+Set the Loss type, batch inputs and target outputs .
+<dt class="parameters">Parameters</dt><dd class="parameters">
+<table class="parameter_table">
+<tr><td class="parameter">LossType</td><td class="description"> integer code for Loss</td></tr>
+<tr><td class="parameter">batch</td><td class="description"> TxN matrix of training data</td></tr>
+<tr><td class="parameter">target</td><td class="description"> TxM matrix of target outputs</td></tr>
+</table>
+</dl>
+</div>
+<p><a id="Lobj"></a>
+<div class="function_box">
+<div class="function declaration">Lobj( v,  aL,  aG,  aH)</div>
+<dl>
+Loss as objective that can be used by maximize package
+</dl>
+</div>
+<div class="footer">Generated by ox/packages/oxdoc</div>
+</div><!-- /page-frame -->
+</body>
+</html>

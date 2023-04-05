@@ -1,1 +1,3 @@
 #include "NeurOx.oxh"
+
+Neurox(){}

@@ -1,26 +1,29 @@
 #include <oxstd.oxh>
 #include <oxdraw.oxh>
 
-enum{Ninputs,Nneurons,Ndims}  	  // dimensions of weight matrices
+/** @name Dimensions **/
+enum{Ninputs,Nneurons,Ndims}  	 
 
-/** @name ActTypes**/
+/** Tags for integer codes for types of Activations.   @name ActTypes**/
 enum{LinAct,RecLinAct,SMAct,SoftAct,NActivationTypes}
 
+/** Represent a layer of neurons in a network. **/
 struct Layer {
-	static 	decl DROPOUT;
+	static 	decl DROPOUT;	//**If TRUE any dropout layer will be activated
 			const decl 	
+						/** will hold selected activation function**/
 						Dims,
 						NW,
-						Activation;	//will hold selected activation function
-	   	  		decl 	next,		//pointer to next layer
-		  	   			prev,		//pointer to previous layer
+						Activation;	
+				decl    next,		//** pointer to next layer
+		  	   			prev,		//** pointer to previous layer
 						inputs,		//input 
 						GM,			//gradient of weights in matrix form
 						B;			// Back propogation storage
 	static	Dimensions(A);
 	virtual Forward();
 	virtual Backward();
-	virtual UpdateWeights(vW);
+	virtual SetParameters(vW);
 	virtual Plot();
 	 		Linear(output);
 			Sigmoid(output);
@@ -28,26 +31,28 @@ struct Layer {
 			SoftMax(output);	
 	}
 
+/** Represent a Droput Layer of Neurons in a Network. **/
 struct 	Dropout : Layer{
 		decl rate;
 		decl curdrops;  //masking vector/matrix
 				Dropout(rate);
 				Forward();
 				Backward();
-				UpdateWeights(vW);
+				SetParameters(vW);
 	}
 	
+/** Represent a Dense  Layer of Neurons in a Network. **/
 struct Dense : Layer { 
 	const decl
-					lambda;		 //coefficient on regularization
+					lambda;		 //** coefficient on regularization
 	decl
-					myvW,		 //vectorized weights
-					MyW0,		//spot in parameter vector for my weights & biases
-					bias,		//bias vector
-					weights;   //weight matrix
+					myvW,		 //** vectorized weights
+					MyW0,		//** spot in parameter vector for my weights & biases
+					bias,		//** bias vector
+					weights;   //** weight matrix
 			Dense(dims,Activation=LinAct,lambda=0.0);
 	Plot();
 	Forward();
 	Backward();
-	UpdateWeights(vW);
+	SetParameters(vW);
 	}	

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="body.css">
+    <link rel="stylesheet" type="text/css" href="oxdoc.css">
+    <link rel="icon" href="oxdoc.png">
+    <title>Layers.oxh</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  </head>
+<body>
+<div class="page-frame">
+<div class="header">
+[ <a href="index.html">NeurOx:  Neural Networks in Ox home</a>
+ | <a href="idx.html">Index</a> ]
+</div>
+
+<p><h1>Layers.oxh</h1>
+
+
+<!-- Dense -->
+<a id="Dense"></a>
+<p><h2><a href="Layers.oxh.html#Dense">Dense</a> : <a href="Layers.oxh.html#Layer">Layer</a> class reference</h2>
+
+<!-- Dense function members (public by default) -->
+<p><table class="method_table">
+<tr><td colspan="2" class="header">Dense function members (public by default)</td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration"><a href="Layers.oxh.html#Dense::Backward">Backward</a>()</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">Back Propagation. </td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration"><a href="Layers.oxh.html#Dense::Dense">Dense</a>( dims,  Activation=LinAct,  lambda=0.0)</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">Create a dense layer in a neural network.</td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration"><a href="Layers.oxh.html#Dense::Forward">Forward</a>()</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">Forward propogation.</td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration"><a href="Layers.oxh.html#Dense::Plot">Plot</a>()</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration"><a href="Layers.oxh.html#Dense::UpdateWeights">UpdateWeights</a>( vW)</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">Update Layer's weights and bias from the overall parameter vector.</td></tr>
+</table>
+
+<!-- Dense data members (protected by default) -->
+<p><table class="method_table">
+<tr><td colspan="2" class="header">Dense data members (protected by default)</td></tr>
+<tr class="even_row"><td class="prefix">public:</td><td class="declaration"><a href="Layers.oxh.html#Dense::bias">bias</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">public:static const </td><td class="declaration"><a href="Layers.oxh.html#Dense::lambda">lambda</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">coefficient on regularization</td></tr>
+<tr class="even_row"><td class="prefix">public:</td><td class="declaration"><a href="Layers.oxh.html#Dense::myvW">myvW</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">weight matrix</td></tr>
+<tr class="even_row"><td class="prefix">public:</td><td class="declaration"><a href="Layers.oxh.html#Dense::MyW0">MyW0</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">public:</td><td class="declaration"><a href="Layers.oxh.html#Dense::weights">weights</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+</table>
+
+<!-- Dropout -->
+<a id="Dropout"></a>
+<p><h2><a href="Layers.oxh.html#Dropout">Dropout</a> : <a href="Layers.oxh.html#Layer">Layer</a> class reference</h2>
+
+<!-- Dropout function members (public by default) -->
+<p><table class="method_table">
+<tr><td colspan="2" class="header">Dropout function members (public by default)</td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration"><a href="Layers.oxh.html#Dropout::Backward">Backward</a>()</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">Update B</td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration"><a href="Layers.oxh.html#Dropout::Dropout">Dropout</a>( rate)</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">Create a dropout layer.</td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration"><a href="Layers.oxh.html#Dropout::Forward">Forward</a>()</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">Zero out a random set of neuron activations.</td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration"><a href="Layers.oxh.html#Dropout::UpdateWeights">UpdateWeights</a>( vW)</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">Do nothing and return 0 penalty.</td></tr>
+</table>
+
+<!-- Dropout data members (protected by default) -->
+<p><table class="method_table">
+<tr><td colspan="2" class="header">Dropout data members (protected by default)</td></tr>
+<tr class="even_row"><td class="prefix">public:</td><td class="declaration"><a href="Layers.oxh.html#Dropout::curdrops">curdrops</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">public:</td><td class="declaration"><a href="Layers.oxh.html#Dropout::rate">rate</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+</table>
+
+<!-- Layer -->
+<a id="Layer"></a>
+<p><h2><a href="Layers.oxh.html#Layer">Layer</a> class reference</h2>
+
+<!-- Layer function members (public by default) -->
+<p><table class="method_table">
+<tr><td colspan="2" class="header">Layer function members (public by default)</td></tr>
+<tr class="even_row"><td class="prefix">virtual </td><td class="declaration"><a href="Layers.oxh.html#Layer::Backward">Backward</a>()</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">static </td><td class="declaration"><a href="Layers.oxh.html#Layer::Dimensions">Dimensions</a>( A)</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">Return dimensions of a matrix as a 1x2 vector.</td></tr>
+<tr class="even_row"><td class="prefix">virtual </td><td class="declaration"><a href="Layers.oxh.html#Layer::Forward">Forward</a>()</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration"><a href="Layers.oxh.html#Layer::Linear">Linear</a>( output)</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">Linear Activation.</td></tr>
+<tr class="even_row"><td class="prefix">virtual </td><td class="declaration"><a href="Layers.oxh.html#Layer::Plot">Plot</a>()</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration"><a href="Layers.oxh.html#Layer::RectLinear">RectLinear</a>( output)</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">Rectilnear Activation.</td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration"><a href="Layers.oxh.html#Layer::Sigmoid">Sigmoid</a>( output)</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">Linear Activation.</td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration"><a href="Layers.oxh.html#Layer::SoftMax">SoftMax</a>( output)</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">SoftMax (Multinomial Logit) Activation.</td></tr>
+<tr class="even_row"><td class="prefix">virtual </td><td class="declaration"><a href="Layers.oxh.html#Layer::UpdateWeights">UpdateWeights</a>( vW)</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+</table>
+
+<!-- Layer data members (protected by default) -->
+<p><table class="method_table">
+<tr><td colspan="2" class="header">Layer data members (protected by default)</td></tr>
+<tr class="even_row"><td class="prefix">public:static const </td><td class="declaration"><a href="Layers.oxh.html#Layer::Activation">Activation</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">public:</td><td class="declaration"><a href="Layers.oxh.html#Layer::B">B</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">public:static const </td><td class="declaration"><a href="Layers.oxh.html#Layer::Dims">Dims</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">public:static </td><td class="declaration"><a href="Layers.oxh.html#Layer::DROPOUT">DROPOUT</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">If TRUE any dropout layer will be activated</td></tr>
+<tr class="even_row"><td class="prefix">public:</td><td class="declaration"><a href="Layers.oxh.html#Layer::GM">GM</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">public:</td><td class="declaration"><a href="Layers.oxh.html#Layer::inputs">inputs</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">public:</td><td class="declaration"><a href="Layers.oxh.html#Layer::next">next</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">public:static const </td><td class="declaration"><a href="Layers.oxh.html#Layer::NW">NW</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">public:</td><td class="declaration"><a href="Layers.oxh.html#Layer::prev">prev</a></td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+</table>
+
+<!-- exported enumerations -->
+<a id="exported enumerations"></a>
+<p><h2>exported enumerations</h2>
+
+<!-- exported enumerations -->
+<p><table class="method_table">
+<tr><td colspan="2" class="header">exported enumerations</td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration">{Ninputs, Nneurons, Ndims}</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description"></td></tr>
+<tr class="even_row"><td class="prefix">&nbsp;</td><td class="declaration">{LinAct, RecLinAct, SMAct, SoftAct, NActivationTypes}</td></tr>
+<tr class="odd_row"><td>&nbsp;</td><td class="description">Tags for integer codes for types of Activations.   @name ActTypes</td></tr>
+</table>
+<p><a id="Dense::Backward"></a>
+<div class="function_box">
+<div class="function declaration">Dense::Backward()</div>
+<dl>
+Back Propagation.
+Compute gradients of weights then update B in the previous level
+to be used as forward part of gradient
+</dl>
+</div>
+<p><a id="Dense::Dense"></a>
+<div class="function_box">
+<div class="function declaration">Dense::Dense( dims,  Activation=LinAct,  lambda=0.0)</div>
+<dl>
+Create a dense layer in a neural network.
+<dt class="parameters">Parameters</dt><dd class="parameters">
+<table class="parameter_table">
+<tr><td class="parameter">dims</td><td class="description">  &lt;Ninputs,Nneurons&gt; dimensions of the layer</td></tr>
+<tr><td class="parameter">ActType</td><td class="description"> integer code for the Activation</td></tr>
+</table>
+</dd>
+<dt class="lambda">lambda</dt><dd class="lambda">
+ absolute value regularization factor [default=0.0]
+</dd>
+</dl>
+</div>
+<p><a id="Dense::Forward"></a>
+<div class="function_box">
+<div class="function declaration">Dense::Forward()</div>
+<dl>
+Forward propogation.
+Compute $b+xA$, send to the Activation, initialize B.
+</dl>
+</div>
+<p><a id="Dense::Plot"></a>
+<div class="function_box">
+<div class="function declaration">Dense::Plot()</div>
+<dl>
+</dl>
+</div>
+<p><a id="Dense::UpdateWeights"></a>
+<div class="function_box">
+<div class="function declaration">Dense::UpdateWeights( vW)</div>
+<dl>
+Update Layer's weights and bias from the overall parameter vector.
+<dt class="parameters">Parameters</dt><dd class="parameters">
+<table class="parameter_table">
+<tr><td class="parameter">newVW</td><td class="description">  vector of all weights and biases in the network</td></tr>
+</table>
+</dl>
+</div>
+<p><a id="Dropout::Backward"></a>
+<div class="function_box">
+<div class="function declaration">Dropout::Backward()</div>
+<dl>
+Update B
+</dl>
+</div>
+<p><a id="Dropout::Dropout"></a>
+<div class="function_box">
+<div class="function declaration">Dropout::Dropout( rate)</div>
+<dl>
+Create a dropout layer.
+<dt class="parameters">Parameters</dt><dd class="parameters">
+<table class="parameter_table">
+<tr><td class="parameter">rate</td><td class="description"> fraction of neurons to leave on (turnoff 1-rate)</td></tr>
+</table>
+</dl>
+</div>
+<p><a id="Dropout::Forward"></a>
+<div class="function_box">
+<div class="function declaration">Dropout::Forward()</div>
+<dl>
+Zero out a random set of neuron activations.
+</dl>
+</div>
+<p><a id="Dropout::UpdateWeights"></a>
+<div class="function_box">
+<div class="function declaration">Dropout::UpdateWeights( vW)</div>
+<dl>
+Do nothing and return 0 penalty.
+</dl>
+</div>
+<p><a id="Layer::Backward"></a>
+<div class="function_box">
+<div class="function declaration">virtual Layer::Backward()</div>
+<dl>
+</dl>
+</div>
+<p><a id="Layer::Dimensions"></a>
+<div class="function_box">
+<div class="function declaration">static Layer::Dimensions( A)</div>
+<dl>
+Return dimensions of a matrix as a 1x2 vector.
+</dl>
+</div>
+<p><a id="Layer::Forward"></a>
+<div class="function_box">
+<div class="function declaration">virtual Layer::Forward()</div>
+<dl>
+</dl>
+</div>
+<p><a id="Layer::Linear"></a>
+<div class="function_box">
+<div class="function declaration">Layer::Linear( output)</div>
+<dl>
+Linear Activation.
+<dt class="parameters">Parameters</dt><dd class="parameters">
+<table class="parameter_table">
+<tr><td class="parameter">output.</td><td class="description">  TxN matrix of neuron outputs</td></tr>
+Activations store values as input in the next layer.
+$$z = y = bias + xA$$
+B is initialize as one.
+</table>
+</dl>
+</div>
+<p><a id="Layer::Plot"></a>
+<div class="function_box">
+<div class="function declaration">virtual Layer::Plot()</div>
+<dl>
+</dl>
+</div>
+<p><a id="Layer::RectLinear"></a>
+<div class="function_box">
+<div class="function declaration">Layer::RectLinear( output)</div>
+<dl>
+Rectilnear Activation.
+<dt class="parameters">Parameters</dt><dd class="parameters">
+<table class="parameter_table">
+<tr><td class="parameter">output.</td><td class="description">  TxN matrix of neuron outputs</td></tr>
+z is stored as input in the next layer.
+$$z = \max{0,y}$$
+$$B = I_{z&gt;0}$$
+</table>
+</dl>
+</div>
+<p><a id="Layer::Sigmoid"></a>
+<div class="function_box">
+<div class="function declaration">Layer::Sigmoid( output)</div>
+<dl>
+Linear Activation.
+<dt class="parameters">Parameters</dt><dd class="parameters">
+<table class="parameter_table">
+<tr><td class="parameter">output.</td><td class="description">  TxN matrix of neuron outputs</td></tr>
+z is stored as input in the next layer.
+$$z = {1 \over 1+e^{y}}$$
+$$B = z *(1-z)$$
+</table>
+</dl>
+</div>
+<p><a id="Layer::SoftMax"></a>
+<div class="function_box">
+<div class="function declaration">Layer::SoftMax( output)</div>
+<dl>
+SoftMax (Multinomial Logit) Activation.
+<dt class="parameters">Parameters</dt><dd class="parameters">
+<table class="parameter_table">
+<tr><td class="parameter">output.</td><td class="description">  TxN matrix of neuron outputs</td></tr>
+z is stored as input in the next layer.
+</table>
+</dl>
+</div>
+<p><a id="Layer::UpdateWeights"></a>
+<div class="function_box">
+<div class="function declaration">virtual Layer::UpdateWeights( vW)</div>
+<dl>
+</dl>
+</div>
+<div class="footer">Generated by ox/packages/oxdoc</div>
+</div><!-- /page-frame -->
+</body>
+</html>

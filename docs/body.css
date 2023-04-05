@@ -1,0 +1,52 @@
+body {
+    margin: 16px;
+    background: white;
+    color: black;
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 100%;
+}
+
+table, p {
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 100%;
+}
+
+pre, tt, xmp {
+    font-family: Consolas, Menlo, monospace;
+    font-size: 100%;
+}
+
+h1 {
+    border-bottom: 1px solid black;
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 150%;
+    font-weight: bold;
+    padding: 4px;
+}
+
+h2 {
+    background: #ccccff;
+    border: 1px solid black;
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 140%;
+    font-weight: bold;
+    padding: 4px;
+    margin-top: 32px;
+}
+
+h3 {
+    font-size: 140%;
+    font-weight: bold;
+    font-family: times;
+}
+
+hr {
+    border: 0;
+    width: 100%; 
+    color: silver;
+    background-color: gray;
+    height: 1px;
+    margin-top: 32px;
+    margin-bottom: 32px;
+}
+

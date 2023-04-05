@@ -5,7 +5,7 @@ UPINC := ..\include
 DOC := ./docs
 OxMenu = ..\OxMenu\include
 
-vpath %.ox .\source
+vpath %.ox $(INC)
 vpath %.h $(INC)
 vpath %.oxh $(INC)
 vpath %.oxo $(INC)
@@ -16,9 +16,9 @@ NeurOxobjects = Network.oxo Layers.oxo
 NeurOx.oxo  : $(NeurOxobjects)
 
 %.oxo : %.ox %.oxh
-	$(OX) $(OXFLAGS) -i$(UPINC);$(INC) -d -c $<
-	$(COPY) source\$@ $(INC)
-	$(ERASE) source\$@
+	$(OX) $(OXFLAGS) -i$(UPINC);$(INC) -d -4 $<
+#	$(COPY) source\$@ $(INC)
+#	$(ERASE) source\$@
 
 .PHONY : document
 document:

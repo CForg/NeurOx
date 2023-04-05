@@ -8,5 +8,5 @@ main() {
 	//net->VOLUME = TRUE;
 	net->Forward();
 	net->Backward();
-	println(net.grad);
+	println("%r",net.vLabels,net.grad);
 }

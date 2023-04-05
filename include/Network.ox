@@ -31,19 +31,30 @@ Lobj(vW,aL,aG,aH) {
 	return 1;
 	}
 
+/** Set all biases and weights in the network. 
+@param vW vectorized bias vectors and weights.
+
+This calls SetParameters for each layer.
+
+It also computes the regulation penalty for the network.
+
+
+**/
+Network::SetParameters(vW) {
+	decl l;
+	penalty = 0.0;        //initialize penalty
+	foreach (l in layers)  
+		penalty += l->SetParameters(vW);
+}
+
 /** Objective  function of the network
 @param vW vector of biases aand weights
 @return Loss + penalty
 
 **/
 Network::Obj(vW) {
-	decl l;
-	penalty = 0.0;        //initialize penalty
-	foreach (l in layers)  
-		penalty += l->UpdateWeights(vW);
-
+	SetParameters(vW);
 	Forward();
-
 	return (floss + penalty);  
 	}
 
@@ -52,6 +63,11 @@ Network::Obj(vW) {
 **/
 Loss::Loss(target) {
 	this.target = target;
+	}
+
+Loss::value() {
+    B[][] = 1.0;
+	return ;
 	}
 
 /** Create a mean squared error loss function.
@@ -99,6 +115,8 @@ CrossEntropy::value() {
 	return loss;
 	}
 	
+/** 
+**/
 BinaryCrossEntropy::BinaryCrossEntropy(target) {
 	CrossEntropy(target);
 	}
@@ -111,8 +129,8 @@ BinaryCrossEntropy::value() {
 
 /** Create a new empty network. **/
 Network::Network() {
-	layers = {};
-	VOLUME = isbuilt = Nlayers = Nweights = 0;
+	vLabels = layers = {};
+	VOLUME = isbuilt = Nlayers = Nparams = 0;
 	BACKPROPAGATION = TRUE;
 	}
 
@@ -120,13 +138,22 @@ Network::Network() {
 @param ... each argument is a layer object.
 **/
 Network::AddLayers(...args) {
-	decl l;
+	decl l,n,k,newlabs;
 	foreach (l in args) {
 		if (!isclass(l,"Layer"))
 			oxrunerror("layer has to be a Layer object");
 		if (isclass(l,"Dense")) {
-			l.MyW0 = Nweights;
-			Nweights += l.NW;
+			l.MyW0 = Nparams;
+			Nparams += l.NW;
+			for(k=0;k<l.Dims[Nneurons];++k) 
+				if (!k) 
+					newlabs = {"b"+sprint(Nlayers)+"_n"+sprint(k)}; 
+				else 
+					newlabs |= "b"+sprint(Nlayers)+"_n"+sprint(k);
+			for (n=0;n<l.Dims[Ninputs];++n)
+				for(k=0;k<l.Dims[Nneurons];++k) 
+					newlabs |= "w"+sprint(Nlayers)+"_i"+sprint(n)+"_n"+sprint(k);
+			vLabels |= newlabs;
 			}
 		else if (isclass(l,"Dropout")) {
 			if (!Nlayers)
@@ -145,8 +172,9 @@ Network::AddLayers(...args) {
 			l.prev = 0; // first layer has no predecessor
 		layers |= l;
 		++Nlayers;		// one more layer
-		println("Layers ",Nlayers,". Total parmams",Nweights);
+		println("Layers ",Nlayers,". Total parmams: ",Nparams);
 		}
+	println("Labels",vLabels);
 	if (Nlayers)
 		layers[.last].next = 0;  //last layer has no successor until built
 	}
@@ -165,13 +193,14 @@ Network::SetBatchAndTarget(LossType,batch,target)	{
 	if (isbuilt)
 		oxrunerror("Network already built");
 	isbuilt = TRUE;
-	if (rows(batch)!=rows(target))
+	if (LossType!=NoLoss && rows(batch)!=rows(target))
 		oxrunerror("rows of batch and target must be equal");
 	if (columns(batch)!=layers[0].Dims[Ninputs])
 		oxrunerror("external batch input wrong dimension");
-	if (rows(target)!=layers[.last].Dims[Nneurons])
+	if (LossType!=NoLoss && rows(target)!=layers[.last].Dims[Nneurons])
 		oxwarning("rows of target not equal to neurons at top layer");
 	switch_single(LossType) {
+		case NoLoss : Loss = new Loss(target);
 		case CELoss : Loss = new CrossEntropy(target);
 		case MSELoss : Loss = new MeanSquareError(target);
 		default : oxrunerror("Loss Type Invalid");
@@ -180,16 +209,14 @@ Network::SetBatchAndTarget(LossType,batch,target)	{
 	decl l;
 	layers[0].inputs = batch; 	// Make batch the inputs to the first layer
 	layers[.last].next = Loss;  // Make successor of last layer the loss
-	BatchSize = rows(target);
+	BatchSize = rows(batch);
 	Loss.B = zeros(BatchSize,layers[.last].Dims[Nneurons]);
 	foreach (l in layers) {
 		if (isclass(l,"Dropout"))
 			l.curdrops = ones(l.inputs);			//l,l.Dims[Nneurons]
-		l.output = zeros(rows(l.inputs),l.Dims[Nneurons]);
-		l.next.inputs = zeros(l.output);
-		l.B = zeros(l.output);		
+		l.B = l.next.inputs = zeros(rows(l.inputs),l.Dims[Nneurons]); 
 		}
-	grad = zeros(Nweights,1);
+	grad = zeros(Nparams,1);
 	}
 
 /**Forward propagate the network.**/	

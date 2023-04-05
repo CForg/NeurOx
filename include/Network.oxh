@@ -1,7 +1,7 @@
 #import "Layers"
 #import <maximize>
 
-enum{BinaryCELoss,CELoss,MSELoss,NLossFunctions}
+enum{NoLoss,BinaryCELoss,CELoss,MSELoss,NLossFunctions}
 
 static decl net;   //object that holds the Network for passing info 
 
@@ -15,7 +15,7 @@ struct Loss {
 									  B,
 		/** networks target. **/      target,
 		/** top-leval activations.**/ inputs; 
-	virtual value(aL,aGrad);
+	virtual value();
 	Loss(target);
 	}
 
@@ -41,18 +41,20 @@ struct Network  {
 	decl isbuilt,
 		 BatchSize,
 		 Nlayers,
-		 Nweights,
+		 Nparams,
 		 layers,
 		 Loss,
 		 penalty,
 		 floss,
-		 grad ;
+		 grad,
+		 vLabels ;
 		 
 		 Network();
 		 Obj(vW);
 		 AddLayers(...args);
 		 CrossEntropy();
-		 SetBatchAndTarget(LossType,batch,target);
+		 SetParameters(vW);
+		 SetBatchAndTarget(LossType,batch,target=0);
 		 Forward();
 		 Backward();
 		 Output();

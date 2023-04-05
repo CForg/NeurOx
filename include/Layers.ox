@@ -37,12 +37,17 @@ Layer::RectLinear(output) {
 	next.inputs[][] = setbounds(output,0,.NaN);
 	B[][] = next.inputs.>0;
 	}
+
+/**SoftMax (Multinomial Logit) Activation.
+@param output.  TxN matrix of neuron outputs
+z is stored as input in the next layer.
+
+**/
 Layer::SoftMax(output) 	{
 	decl ev = exp(output-maxr(output));
 	next.inputs[][] = ev ./ sumr(ev);
 	B[][] = next.inputs .* (1-next.inputs);  	//probably wrong!
-	}
-	
+	}	
 
 /** Create a dense layer in a neural network.
 @param dims  <Ninputs,Nneurons> dimensions of the layer
@@ -73,7 +78,7 @@ This copies elements of newVW from MyW0 to MyW0+NW-1 and reshapes them
 into bias vector and weight matrix.
 @return the "regularization" penalty for the weights
 **/
-Dense::UpdateWeights(newVW) {
+Dense::SetParameters(newVW) {
 	bias[] = newVW[MyW0:MyW0+Dims[Nneurons]-1];
 	myvW[] = newVW[(MyW0+Dims[Nneurons]):(MyW0+NW-1)];
 	weights[][] = reshape(myvW,Dims[Ninputs],Dims[Nneurons]);
@@ -116,7 +121,7 @@ Dropout::Dropout(rate){
 
 /**Do nothing and return 0 penalty.
 **/
-Dropout::UpdateWeights(newvW) {
+Dropout::SetParameters(newvW) {
 	return 0.0;   
 	}
 
