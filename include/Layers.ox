@@ -53,12 +53,18 @@ Layer::SoftMax(output) 	{
 @param dims  <Ninputs,Nneurons> dimensions of the layer
 @param ActType integer code for the Activation
 @lambda absolute value regularization factor [default=0.0]
+@ibias initial bias [default 0 = vector of zeros]
+@iweights initial bias [default 0 = equal normalized weights]
 **/
-Dense::Dense(Dims,ActType,lambda) {
+Dense::Dense(Dims,ActType,lambda,ibias,iweights) {
 	this.Dims = Dims;
 	this.lambda = lambda;
-	bias = -1 + 2*ranu(1,Dims[Nneurons]);
-	weights = -1 + 2*ranu(Dims[Ninputs],Dims[Nneurons]);
+	bias = isint(ibias) ? zeros(1,Dims[Nneurons]) : ibias;
+	weights = isint(iweights) ? constant(1/Dims[Ninputs],Dims[Ninputs],Dims[Nneurons]) : iweights;
+	if (Dimensions(bias)!=1~Dims[Nneurons]) 
+		oxrunerror("initial bias vector not right dimensions");
+	if (Dimensions(weights)!=Dims) 
+		oxrunerror("initial weight matrix not right dimensions");		
 	NW = int(Dims[Nneurons]+prodr(Dims));//weights & bias parameters
 	myvW = zeros(NW,1);		 //scratch space for vectorized version of weights
 	GM = zeros(weights)|0;  // matrix for bias and weight gradients
@@ -67,7 +73,7 @@ Dense::Dense(Dims,ActType,lambda) {
 		case RecLinAct		:  Activation = RectLinear;
 		case SMAct			:  Activation = Sigmoid;
 		case SoftAct		:  Activation = SoftMax;
-		default				:  oxrunerror("Activation Type Invalid");
+		default				:  oxrunerror("Activation Type Invalid, see integer codes in enum{}");
 		}
     }
 

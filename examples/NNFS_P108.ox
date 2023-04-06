@@ -3,24 +3,18 @@
 #include "spiral.ox"   // the spiral generating function
 
 main() {
-    decl net,Xspiral,batch,target,layer0,layer1;
+    decl net,Xspiral,batch,target;
   	Xspiral = spiral(100,3);
 
     batch = Xspiral[][1:2];
     target = Xspiral[][0];
-
-    net = new Network();                        //create a network
-	net.AddLayers(new Dense(<2,3>,RecLinAct));     //add the RecLinAct layer
-    net.AddLayers(new Dense(<3,3>,SoftAct));
-	net.SetBatchAndTarget(NoLoss,batch,target);        // set Loss as "NoLoss" so no target required, feed in batch
-
-    layer0 =  vecr( zeros(1,3) | 0.01*rann(2,3) );
-    layer1 =  vecr( zeros(1,3) | 0.01*rann(3,3) );
-
-    net.SetParameters( layer0 | layer1 );  // Populate weights and biases (always vectorized then reshaped internally)
-
-	net->VOLUME = TRUE;
-	net->Forward();
+   
+    net = new Network();                                                     //create a network
+	  net.AddLayers(new Dense(<2,3>,RecLinAct, 0.0, 0, 0.01*rann(2,3)) );     //add the RecLinAct layer,lambda=0.0, default bias, random weights
+    net.AddLayers(new Dense(<3,3>,SoftAct,   0.0, 0, 0.01*rann(3,3) ));
+	  net.SetBatchAndTarget(NoLoss,batch,target);        // set Loss as "NoLoss" so no target required, feed in batch
+	  net->VOLUME = TRUE;
+	  net->Forward();
     println("Output of the layer:","%12.8f",net.Loss.inputs[:5][]);    //outputs are always stored as inputs to the next level (in this case in Loss)
 
 }

@@ -8,15 +8,15 @@ main() {
 
     batch = Xspiral[][1:2];
     target = Xspiral[][0];
-
-    net = new Network();                        //create a network
-	net.AddLayers(new Dense(<2,3>,LinAct));     //add the LinAct layer
-
-	net.SetBatchAndTarget(NoLoss,batch,target);        // set Loss as "NoLoss" so no target required, feed in batch
-
     bias = zeros(1,3);
     weights = 0.01*rann(2,3);
-    net.SetParameters( vecr(bias|weights) );  // Populate weights and biases (always vectorized then reshaped internally)
+
+    net = new Network();                        //create a network
+	net.AddLayers(
+            new Dense(<2,3>,LinAct,0.0,bias,weights)    //create layer, populate parameters
+            );     //add the LinAct layer
+
+	net.SetBatchAndTarget(NoLoss,batch,target);        // set Loss as "NoLoss" so no target required, feed in batch
 
 	net->VOLUME = TRUE;
 	net->Forward();

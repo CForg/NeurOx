@@ -85,7 +85,7 @@ B initialized as the gradient, (y-\hat y)
 MeanSquareError::value() {
 	B[][] = target-inputs';
 	loss = sumsqrc(B)/2.0;
-	return loss;
+	return double(loss);
 	}
 
 /** Create a CrossEntropy (multinomial logit) loss function".
@@ -112,7 +112,7 @@ CrossEntropy::value() {
 		}
 	loss = -sumc(log(vL));
 	B[][] .*= -1.0 ./ vL;
-	return loss;
+	return double(loss);
 	}
 	
 /** 
@@ -124,7 +124,7 @@ BinaryCrossEntropy::value() {
 	B[][] = (2*target-1).*inputs+(1-target);
 	loss = -sumc(log(B)); //transpose once
 	B[][] = -(2.0*target-1)./ B;
-	return loss;
+	return double(loss);
 	}
 
 /** Create a new empty network. **/
@@ -147,12 +147,12 @@ Network::AddLayers(...args) {
 			Nparams += l.NW;
 			for(k=0;k<l.Dims[Nneurons];++k) 
 				if (!k) 
-					newlabs = {"b"+sprint(Nlayers)+"_n"+sprint(k)}; 
+					newlabs = {sprint(Nlayers)+"b"+sprint(k)}; 
 				else 
-					newlabs |= "b"+sprint(Nlayers)+"_n"+sprint(k);
+					newlabs |= sprint(Nlayers)+"b"+sprint(k);
 			for (n=0;n<l.Dims[Ninputs];++n)
 				for(k=0;k<l.Dims[Nneurons];++k) 
-					newlabs |= "w"+sprint(Nlayers)+"_i"+sprint(n)+"_n"+sprint(k);
+					newlabs |= sprint(Nlayers)+"w"+sprint(n)+"_"+sprint(k);
 			vLabels |= newlabs;
 			}
 		else if (isclass(l,"Dropout")) {
@@ -174,7 +174,6 @@ Network::AddLayers(...args) {
 		++Nlayers;		// one more layer
 		println("Layers ",Nlayers,". Total parmams: ",Nparams);
 		}
-	println("Labels",vLabels);
 	if (Nlayers)
 		layers[.last].next = 0;  //last layer has no successor until built
 	}

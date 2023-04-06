@@ -10,8 +10,11 @@
             "command": "C:\\PROGRA~1\\OxMetrics9\\ox\\oxl.exe",
             "args": [
                 "-i${workspaceFolder}\\include",
-                "${file}"
+                "${fileBasenameNoExtension}"
             ],
+            "options":             {
+                "cwd": "${fileDirname}"
+            },
             "problemMatcher": [],
             "group": {
                 "kind": "build",

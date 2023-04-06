@@ -50,7 +50,7 @@ struct Dense : Layer {
 					MyW0,		//** spot in parameter vector for my weights & biases
 					bias,		//** bias vector
 					weights;   //** weight matrix
-			Dense(dims,Activation=LinAct,lambda=0.0);
+			Dense(dims,Activation=LinAct,lambda=0.0,ibias=0,iweights=0);
 	Plot();
 	Forward();
 	Backward();
