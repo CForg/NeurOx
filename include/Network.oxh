@@ -14,13 +14,15 @@ struct Loss {
 									  loss,
 									  B,
 		/** networks target. **/      target,
-		/** top-leval activations.**/ inputs; 
-	virtual value();
-	Loss(target);
+		/** top-leval activations.**/ inputs,
+		 							  prediction,
+		 							  accuracy;
+			Loss(target);
+  	virtual value();
 	}
 
 struct CrossEntropy : Loss {
-	const decl rng,targcol;
+	const decl rng, targcol, J;
 	virtual value();
 	CrossEntropy(target);
 	}
@@ -37,7 +39,8 @@ struct MeanSquareError : Loss {
 struct Network  {
 	static decl
 			BACKPROPAGATION, // use Backward for gradient (otherwise numeric)
-			VOLUME; //output level
+			PREDICTING,  	// compute prediction and accuracy
+			VOLUME; 		//output level
 	decl isbuilt,
 		 BatchSize,
 		 Nlayers,

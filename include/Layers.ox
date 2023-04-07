@@ -1,73 +1,33 @@
-/** Layers of Neurons. **/
+/** Layers of Neurons and Activations. **/
 #include "Layers.oxh"
 
 /**Return dimensions of a matrix as a 1x2 vector. **/
 Layer::Dimensions(A)   { return rows(A)~columns(A); }
 
-/**Linear Activation.
-@param output.  TxN matrix of neuron outputs
-Activations store values as input in the next layer. 
-$$z = y = bias + xA$$
-B is initialize as one.
-**/
-Layer::Linear(output)		{
-	next.inputs[][] = output;	//just pass output 
-	B[][] = 1.0;
-	}
-
-/**Linear Activation.
-@param output.  TxN matrix of neuron outputs
-z is stored as input in the next layer.
-$$z = {1 \over 1+e^{y}}$$
-$$B = z *(1-z)$$
-**/
-Layer::Sigmoid(output) 	{
-	next.inputs[][] =  1.0 ./(1+exp(-output));
-	B[][] = next.inputs.*(1-next.inputs);		
-	}
-
-/**Rectilnear Activation.
-@param output.  TxN matrix of neuron outputs
-z is stored as input in the next layer.
-$$z = \max{0,y}$$
-$$B = I_{z>0}$$
-
-**/
-Layer::RectLinear(output) {
-	next.inputs[][] = setbounds(output,0,.NaN);
-	B[][] = next.inputs.>0;
-	}
-
-/**SoftMax (Multinomial Logit) Activation.
-@param output.  TxN matrix of neuron outputs
-z is stored as input in the next layer.
-
-**/
-Layer::SoftMax(output) 	{
-	decl ev = exp(output-maxr(output));
-	next.inputs[][] = ev ./ sumr(ev);
-	B[][] = next.inputs .* (1-next.inputs);  	//probably wrong!
-	}	
-
 /** Create a dense layer in a neural network.
-@param dims  <Ninputs,Nneurons> dimensions of the layer
+@param dims =  <Ninputs,Nneurons> dimensions of the layer
 @param ActType integer code for the Activation
 @lambda absolute value regularization factor [default=0.0]
 @ibias initial bias [default 0 = vector of zeros]
 @iweights initial bias [default 0 = equal normalized weights]
+
 **/
 Dense::Dense(Dims,ActType,lambda,ibias,iweights) {
 	this.Dims = Dims;
 	this.lambda = lambda;
-	bias = isint(ibias) ? zeros(1,Dims[Nneurons]) : ibias;
-	weights = isint(iweights) ? constant(1/Dims[Ninputs],Dims[Ninputs],Dims[Nneurons]) : iweights;
+	bias = isint(ibias) 
+				? zeros(1,Dims[Nneurons]) 
+				: ibias;
+	weights = isint(iweights) 
+				? constant(1/Dims[Ninputs],Dims[Ninputs],Dims[Nneurons]) 
+				: iweights;
 	if (Dimensions(bias)!=1~Dims[Nneurons]) 
 		oxrunerror("initial bias vector not right dimensions");
 	if (Dimensions(weights)!=Dims) 
 		oxrunerror("initial weight matrix not right dimensions");		
-	NW = int(Dims[Nneurons]+prodr(Dims));//weights & bias parameters
-	myvW = zeros(NW,1);		 //scratch space for vectorized version of weights
-	GM = zeros(weights)|0;  // matrix for bias and weight gradients
+	NW = int(Dims[Nneurons]+prodr(Dims));  //# of weights & bias parameters
+	myvW = zeros(NW,1);		 			  //scratch space for vectorized parameters
+	GM = zeros(weights)|0;  			  // matrix for bias and weight gradient
 	switch_single (ActType) {
 		case LinAct 		:  Activation = Linear;
 		case RecLinAct		:  Activation = RectLinear;
@@ -106,11 +66,11 @@ to be used as forward part of gradient
 **/
 Dense::Backward() {
 	decl t;
-	for (GM[][] = 0.0, t=0 ;t<rows(inputs);++t) 
-		GM += (1~inputs[t][])'*B[t][];		//aggregate across observations 
+	for (GM[][] = 0.0, t=0 ;t<rows(inputs);++t) //aggregate across observations 
+		GM += (1~inputs[t][])'*B[t][];			//1 is coeff on bias, 
 	if (isclass(prev)) // not the first layer so
 		prev.B[][] .*= B*weights';		//continue chain rule, multiply by weights' & previous layer's activation
-	return vecr(GM);   					
+	return vecr(GM);   					// vectorize 
 	}
 
 Dense::Plot() {
@@ -145,3 +105,51 @@ Dropout::Forward() {
 Dropout::Backward() {
 	prev.B[][] .*= B;	// multiply my activation gradient x future effects
 	}
+
+/*------------------------------  Activations -------------------------------- */
+
+
+/**Linear Activation.
+@param output.  TxN matrix of neuron outputs
+Activations store values as input in the next layer. 
+$$z = y = b + xA$$
+B is initialize as one.
+**/
+Layer::Linear(output)		{
+	next.inputs[][] = output;	//just pass output 
+	B[][] = 1.0;
+	}
+
+/**Linear Activation.
+@param output.  TxN matrix of neuron outputs
+z is stored as input in the next layer.
+$$z = {1 \over 1+e^{y}}$$
+$$B = z *(1-z)$$
+**/
+Layer::Sigmoid(output) 	{
+	next.inputs[][] =  1.0 ./(1+exp(-output));
+	B[][] = next.inputs.*(1-next.inputs);		//dF = F(1-F)
+	}
+
+/**Rectilnear Activation.
+@param output.  TxN matrix of neuron outputs
+z is stored as input in the next layer.
+$$z = \max{0,y}$$
+$$B = I_{z>0}$$
+
+**/
+Layer::RectLinear(output) {
+	next.inputs[][] = setbounds(output,0,.NaN);
+	B[][] = next.inputs.>0;
+	}
+
+/**SoftMax (Multinomial Logit) Activation.
+@param output.  TxN matrix of neuron outputs
+z is stored as input in the next layer.
+$$z = f(y) = f(b+xA).$$
+**/
+Layer::SoftMax(output) 	{
+	decl ev = exp(output-maxr(output));
+	next.inputs[][] = ev ./ sumr(ev);
+	B[][] = next.inputs .* (1-next.inputs);  	//Not sure about this yet.
+	}	

@@ -1,131 +1,6 @@
-/** Neural Network.**/
+/** Neural Network and Loss Functions.**/
 #include "Network.oxh"
 
-/** Interface to Ox's optimization library.
-@param vW vector of weights and biases
-@param aL address to place -Loss 
-@param aG 0 or address to place Gradient if called for
-@param aH 0 or address to place Hessian if called for
-
-@return 1
-
-Note:  This version does not compute H
-If Network::BACKPROGRATION is TRUE then the gradient is computed uisng Backward()
-Otherwise Num1Derivative() is used to compute numerical gradient
-
-**/
-Lobj(vW,aL,aG,aH) {
-	aL[0] = -net->Obj(vW);	   //convert to maximum
-	if (!isint(aG))	{
-		if (net.BACKPROPAGATION) {
-			net->Backward();
-			aG[0] = -net.grad;	//Have to negate analytic loss derivative
-			}
-		else {
-			decl tmpDO = Layer::DROPOUT;
-			Layer::DROPOUT=FALSE;
-			Num1Derivative(Lobj,vW,aG);
-			Layer::DROPOUT=tmpDO;
-			}
-		}
-	return 1;
-	}
-
-/** Set all biases and weights in the network. 
-@param vW vectorized bias vectors and weights.
-
-This calls SetParameters for each layer.
-
-It also computes the regulation penalty for the network.
-
-
-**/
-Network::SetParameters(vW) {
-	decl l;
-	penalty = 0.0;        //initialize penalty
-	foreach (l in layers)  
-		penalty += l->SetParameters(vW);
-}
-
-/** Objective  function of the network
-@param vW vector of biases aand weights
-@return Loss + penalty
-
-**/
-Network::Obj(vW) {
-	SetParameters(vW);
-	Forward();
-	return (floss + penalty);  
-	}
-
-/** Base Loss function creator.
-@param target T x M matrix of target data
-**/
-Loss::Loss(target) {
-	this.target = target;
-	}
-
-Loss::value() {
-    B[][] = 1.0;
-	return ;
-	}
-
-/** Create a mean squared error loss function.
-@param target T x M matrix of target data
-**/
-MeanSquareError::MeanSquareError(target) {
-	Loss(target);
-	}
-
-/** Compute MSE loss and initialize B.
-$$L = \sum_{t} {(y-\hat y)}^2 / 2.$$
-B initialized as the gradient, (y-\hat y)
-@return L
-**/
-MeanSquareError::value() {
-	B[][] = target-inputs';
-	loss = sumsqrc(B)/2.0;
-	return double(loss);
-	}
-
-/** Create a CrossEntropy (multinomial logit) loss function".
-@param target T x M matrix of target data
-**/
-CrossEntropy::CrossEntropy(target) {
-	Loss(target);
-	rng = range(0,rows(target)-1);
-	targcol = reshape(range(0,maxc(target)),rows(target),maxc(target)+1);
-	targcol = target.==targcol;
-	range(0,maxc(target)-1);
-	}
-
-/** Compute MSE loss and initialize B.
-
-@return  L  
-**/
-CrossEntropy::value() {
-	vL =selectrc(inputs,rng,target)';
-	B[][] = vL.*(targcol - inputs);
-	if (Network::VOLUME) {
-		decl pred = maxcindex(inputs');
-		println("Prediction Rate",meanc(pred'.==target));
-		}
-	loss = -sumc(log(vL));
-	B[][] .*= -1.0 ./ vL;
-	return double(loss);
-	}
-	
-/** 
-**/
-BinaryCrossEntropy::BinaryCrossEntropy(target) {
-	CrossEntropy(target);
-	}
-BinaryCrossEntropy::value() {
-	B[][] = (2*target-1).*inputs+(1-target);
-	loss = -sumc(log(B)); //transpose once
-	B[][] = -(2.0*target-1)./ B;
-	return double(loss);
-	}
 
 /** Create a new empty network. **/
 Network::Network() {
@@ -218,6 +93,22 @@ Network::SetBatchAndTarget(LossType,batch,target)	{
 	grad = zeros(Nparams,1);
 	}
 
+/** Set all biases and weights in the network. 
+@param vW vectorized bias vectors and weights.
+
+This calls SetParameters for each layer.
+
+It also computes the regulation penalty for the network.
+
+**/
+Network::SetParameters(vW) {
+	decl l;
+	penalty = 0.0;        //initialize penalty
+	foreach (l in layers)  
+		penalty += l->SetParameters(vW);
+}
+
+
 /**Forward propagate the network.**/	
 Network::Forward() {
 	decl l;
@@ -237,17 +128,137 @@ Network::Output() {
 /** Back Propgation .**/
 Network::Backward() {
 	decl l,lastdone;
-	lastdone = rows(grad);	//work backwards in the W matrix
-	l = layers[.last];
-	//gradient of the loss function initializes B for chain rule
-	l.B[][] = Loss.B;
+	lastdone = rows(grad);	//work from bottom up in the gradient matrix
+	l = layers[.last];		// work backwards in the linked list of layers
+	l.B[][] = Loss.B;		//B for chain rule with gradient of loss function 
 	while (isclass(l)) {
-		if (l.NW) { // insert new layer gradients in the overall vector
-			grad[lastdone-l.NW:lastdone-1] = l->Backward();
-			lastdone -= l.NW;
+		if (l.NW) { 		// layer has some parameters
+			grad[lastdone-l.NW:lastdone-1] = l->Backward();  //insert vectorized gradient in right location
+			lastdone -= l.NW;								 //move up the vector
 			}
-		else	//Dropout layer
-			l->Backward();
-		l = l.prev;
+		else	
+			l->Backward();									// no parameters layer
+		l = l.prev;											//move backward in the network
 		}
 	}
+
+/*------------------------------  Objective Functions  -------------------------------- */
+
+/** Objective function of the network: Loss + penalty.
+@param vW vector of biases aand weights
+@return Loss + penalty
+
+**/
+Network::Obj(vW) {
+	SetParameters(vW);			//populate new parameters
+	Forward();				   //move forward
+	return (floss + penalty);  //return overall objective
+	}
+
+
+/** Interface to Ox's optimization library.
+See Ox's maxmize Package for explanation.
+
+If Network::BACKPROGRATION is TRUE then the gradient is computed uisng Backward()
+Otherwise Num1Derivative() is used to compute numerical gradient
+
+@param vW vector of weights and biases
+@param aL address to place -Loss 
+@param aG 0 or address to place Gradient if called for
+@param aH 0 or address to place Hessian if called for
+
+
+@comment
+This version does not compute H
+
+@return 1
+
+**/
+Lobj(vW,aL,aG,aH) {
+	aL[0] = -net->Obj(vW);	   //convert to maximum
+	if (!isint(aG))	{
+		if (net.BACKPROPAGATION) {
+			net->Backward();
+			aG[0] = -net.grad;	//Have to negate analytic loss derivative
+			}
+		else {
+			decl tmpDO = Layer::DROPOUT;
+			Layer::DROPOUT=FALSE;
+			Num1Derivative(Lobj,vW,aG);
+			Layer::DROPOUT=tmpDO;
+			}
+		}
+	return 1;
+	}
+
+/*------------------------------  Loss Functions  -------------------------------- */
+
+/** Base Loss function creator.
+@param target T x M matrix of target data
+**/
+Loss::Loss(target) {
+	this.target = target;
+	}
+
+Loss::value() {
+    B[][] = 1.0;
+	return ;
+	}
+
+/** Create a mean squared error loss function.
+@param target T x M matrix of target data
+**/
+MeanSquareError::MeanSquareError(target) {
+	Loss(target);
+	}
+
+/** Compute MSE loss and initialize B.
+$$L = \sum_{t} {(y-\hat y)}^2 / 2.$$
+B initialized as the gradient, (y-\hat y)
+@return L
+**/
+MeanSquareError::value() {
+	B[][] = target-inputs';
+	loss = sumsqrc(B)/2.0;
+	return double(loss);
+	}
+
+/** Create a CrossEntropy (multinomial logit) loss function.
+@param target T x M matrix of target data
+**/
+CrossEntropy::CrossEntropy(target) {
+	Loss(target);
+	J = maxc(target);								//number of classes
+	rng = range(0,rows(target)-1);					// 0...T-1:  used when computing value
+	targcol = reshape(range(0,J),rows(target),J+1);  // repeated rows 0 1 2 ... J-1		
+	targcol = target.==targcol;						//indicator that this column is the target
+	}
+
+/** Compute MSE loss and initialize B.
+
+@return  L  
+**/
+CrossEntropy::value() {
+	vL =selectrc(inputs,rng,target)';		
+	B[][] = vL.*(targcol - inputs);			// Jacobian of objective
+	if (Network::PREDICTING) {
+		prediction = maxcindex(inputs');
+		accuracy = double(meanc(prediction'.==target));
+		}
+	loss = -sumc(log(vL));		//Don't average like NNFS, just sum
+	B[][] .*= -1.0 ./ vL;		// chain rule for sum of logs
+	return double(loss);
+	}
+	
+/** 
+**/
+BinaryCrossEntropy::BinaryCrossEntropy(target) {
+	CrossEntropy(target);
+	}
+BinaryCrossEntropy::value() {
+	B[][] = (2*target-1).*inputs+(1-target);
+	loss = -sumc(log(B)); 
+	B[][] = -(2.0*target-1)./ B;
+	return double(loss);
+	}
+
