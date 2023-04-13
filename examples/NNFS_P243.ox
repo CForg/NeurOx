@@ -1,35 +1,44 @@
-/* This replicates the code on Page 243 of NNFS usng NeurOx */
+/* 
+Replicate the code on Page 243 of NNFS usng NeurOx 
+*/
 #import "NeurOx"        //import the NeurOx package
 #include "spiral.ox"   // the spiral generating function
 
+enum{Nk=100,Nn=2,K=3,Nh=3}   
+
 main() {
     decl net,Xspiral,batch,target,layer0,layer1,W;
-  	Xspiral = spiral(100,3);
+  	Xspiral = spiral(Nk,K);
 
-    batch = Xspiral[][1:2];
     target = Xspiral[][0];
+    batch = Xspiral[][1:];
 
-    layer0 = zeros(1,3)|0.01*rann(2,3);     //stack weights under bias
-    layer1 = zeros(1,3)|0.01*rann(3,3);
+    layer0 = zeros(1,Nh)|0.01*rann(Nn,Nh);     //stack weights under bias
+    layer1 = zeros(1,K)|0.01*rann(Nh,K);
     W = vecr(layer0)|vecr(layer1);        //vectorize all parameters (will be reshaped interally)
 
     net = new Network();                        //create a network
-	net.AddLayers(
-        new Dense(<2,3>,RecLinAct),      //add the RecLinAct layer
-        new Dense(<3,3>,SoftAct)
+	  net.AddLayers(
+        new Dense(<Nn,Nh>,RecLinAct),      //add the RecLinAct layer
+        new Dense(<Nh,K>,SoftAct)
         );
-	net.SetBatchAndTarget(CELoss,batch,target);        // set Loss as "NoLoss" so no target required, feed in batch
+    net.SetLoss(CELoss);                                // set Loss as Cross Entropy (multinomial logit)
+	  net.SetBatchAndTarget(batch,target);              
     net.SetParameters(W);    
-	net->VOLUME = TRUE;
-	net->Forward();
-    println("Output of the layer:","%12.8f",net.Loss.inputs[:5][]);    //outputs are always stored as inputs to the next level (in this case in Loss)
-    println("Loss: ",net.floss);
+	  net->VOLUME = TRUE;
+	  net->Forward();
+    println("Output of the layer:",
+        "%12.8f",net.Loss.inputs[:5][],             //outputs stored as inputs to the next level (in this case in Loss)
+        "Loss: ",net.floss                          // same as net.L.loss
+        );    
     net->Backward();
     net->VOLUME = FALSE;
     decl NumGrad;
-    ::net = net;            // have to copy the network to global so it can be used by Lobj
-    Num1Derivative(Lobj,W,&NumGrad);
-    println("Full Gradient:","%c",{"BackProg","Numerical (-Loss)"},net.grad~NumGrad);
+    ::net = net;                                        // have to copy the network to the global "net" variable so it can be used by Lobj().  
+    Num1Derivative(Lobj,W,&NumGrad);                    // THis is Ox's built-in numerical derivative function.
+    println("Full Gradient:",
+            "%c",{"BackProg","Numerical (-Loss)"},
+            net.grad~NumGrad);                          // net.grad = -NumGrad because Lobj() reverses the sign to maximize log likelihood
     }
 /* SHould produce this output.  NOte the random number generator produces different weights
 

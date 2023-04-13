@@ -17,23 +17,24 @@ struct Loss {
 		/** top-leval activations.**/ inputs,
 		 							  prediction,
 		 							  accuracy;
-			Loss(target);
+			SetTarget(target);
   	virtual value();
 	}
 
 struct CrossEntropy : Loss {
-	const decl rng, targcol, J;
+	decl 
+			rng, targcol, J;
 	virtual value();
-	CrossEntropy(target);
+			SetTarget(target);
 	}
 	
 struct BinaryCrossEntropy : CrossEntropy {
 	value();
-	BinaryCrossEntropy(target);
+	SetTarget(target);
 	}	
+
 struct MeanSquareError : Loss {
 	value();
-	MeanSquareError(target);
 	}
 
 struct Network  {
@@ -42,6 +43,7 @@ struct Network  {
 			PREDICTING,  	// compute prediction and accuracy
 			VOLUME; 		//output level
 	decl isbuilt,
+		 LossType,
 		 BatchSize,
 		 Nlayers,
 		 Nparams,
@@ -57,7 +59,8 @@ struct Network  {
 		 AddLayers(...args);
 		 CrossEntropy();
 		 SetParameters(vW);
-		 SetBatchAndTarget(LossType,batch,target=0);
+		 SetLoss(LossType=NoLoss);
+		 SetBatchAndTarget(batch,target=0);
 		 Forward();
 		 Backward();
 		 Output();

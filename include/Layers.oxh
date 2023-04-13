@@ -18,7 +18,6 @@ struct Layer {
 				decl    next,		//** pointer to next layer
 		  	   			prev,		//** pointer to previous layer
 						inputs,		//input 
-						GM,			//gradient of weights in matrix form
 						B;			// Back propogation storage
 	static	Dimensions(A);
 	virtual Forward();
@@ -43,14 +42,14 @@ struct 	Dropout : Layer{
 	
 /** Represent a Dense  Layer of Neurons in a Network. **/
 struct Dense : Layer { 
-	const decl
-					lambda;		 //** coefficient on regularization
 	decl
-					myvW,		 //** vectorized weights
+					lambda,		 //** coefficient on regularization
 					MyW0,		//** spot in parameter vector for my weights & biases
+					GM,			//gradient of weights in matrix form
+					GP,			//gradient of penalty in matrix form
 					bias,		//** bias vector
 					weights;   //** weight matrix
-			Dense(dims,Activation=LinAct,lambda=0.0,ibias=0,iweights=0);
+	Dense(dims,Activation=LinAct,lambda=0.0,ibias=0,iweights=0);
 	Plot();
 	Forward();
 	Backward();

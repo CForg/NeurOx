@@ -1,45 +1,52 @@
-/* This replicates the code on Page 136 of NNFS usng NeurOx */
+/**
+Replicate the code on Page 136 of NNFS usng NeurOx 
+**/
 #import "NeurOx"        //import the NeurOx package
 #include "spiral.ox"   // the spiral generating function
 
+enum{Nk=100,Nn=2,K=3,Nh=3}   
+
 main() {
     decl net,Xspiral,batch,target,layer0,layer1,W,bestW, bestL, trip;
-  	Xspiral = spiral(100,3);
+  	Xspiral = spiral(Nk,K);
 
-    batch = Xspiral[][1:2];
     target = Xspiral[][0];
+    batch = Xspiral[][1:];
 
-    layer0 = zeros(1,3)|0.01*rann(2,3);     //stack weights under bias
-    layer1 = zeros(1,3)|0.01*rann(3,3);
+
+    layer0 = zeros(1,Nh)|0.01*rann(Nn,Nh);     //stack weights under bias
+    layer1 = zeros(1,K)|0.01*rann(Nh,K);
     W = vecr(layer0)|vecr(layer1);        //vectorize all parameters (will be reshaped interally)
 
     net = new Network();                        //create a network
 	net.AddLayers(
-        new Dense(<2,3>,RecLinAct),      //add the RecLinAct layer
-        new Dense(<3,3>,SoftAct)
+        new Dense(<Nn,Nh>,RecLinAct),      //add the RecLinAct layer
+        new Dense(<Nh,K>,SoftAct)
         );
-	net.SetBatchAndTarget(CELoss,batch,target);        // set Loss as "NoLoss" so no target required, feed in batch
+    net.SetLoss(CELoss);                                // set Loss as Cross Entropy (multinomial logit)
+	net.SetBatchAndTarget(batch,target);        
     net.SetParameters(W);    
 	net->Forward();
-    bestL = net.floss;
-    bestW = W;
+    bestL = net.floss;                                // initialize best Loss so far
+    bestW = W;                                        // and best W vector so far
     println("initial loss:",bestL);
     for(trip=0; trip<10000; ++trip) {
-        W += 0.05 * rann(rows(W),1);
+        W += 0.05 * rann(rows(W),1);                 // random search (so dumb...should use Amoeba!)
         net.SetParameters(W);    
 	    net->Forward();
-        if (net.floss<bestL) {
-            bestL = net.floss;
+        if (net.floss<bestL) {                      // is the current value better than the best so far?
+            bestL = net.floss;                      
             bestW = W;
             println("* ",trip,":",bestL);
             }
         else   
-            if (!imod(trip,10)) print(".");     //progress dots every 10 trips
+            if (!imod(trip,10)) print(".");       //progress dots every 10 trips
         }
 
     }
-/* SHould produce this output.  NOte the random number generator produces different weights
 
+/* SHould produce this output.  NOte the random number generator produces different weights
+<pre>
 Ox 9.06 (Windows_64/Parallel) (C) J.A. Doornik, 1994-2022 (oxlang.dev)
 Layers 1. Total parmams: 9
 Layers 2. Total parmams: 21
@@ -60,4 +67,6 @@ initial loss:329.586
 ...............................................................................................................................
 ...............................................................................................................................
 ...................................................................................................... *  
+
+</pre>
 */

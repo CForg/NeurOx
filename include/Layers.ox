@@ -26,8 +26,8 @@ Dense::Dense(Dims,ActType,lambda,ibias,iweights) {
 	if (Dimensions(weights)!=Dims) 
 		oxrunerror("initial weight matrix not right dimensions");		
 	NW = int(Dims[Nneurons]+prodr(Dims));  //# of weights & bias parameters
-	myvW = zeros(NW,1);		 			  //scratch space for vectorized parameters
-	GM = zeros(weights)|0;  			  // matrix for bias and weight gradient
+	GP = zeros(NW,1);		 			  //scratch space for vectorized parameters AND gradient of penalty
+	GM = zeros(weights)|0;  			  // matrix for bias and weight loss gradients
 	switch_single (ActType) {
 		case LinAct 		:  Activation = Linear;
 		case RecLinAct		:  Activation = RectLinear;
@@ -42,15 +42,32 @@ Dense::Dense(Dims,ActType,lambda,ibias,iweights) {
 
 This copies elements of newVW from MyW0 to MyW0+NW-1 and reshapes them
 into bias vector and weight matrix.
+
+@comment
+	Currently the same &lambda; for bias and weights at a given layer
+
 @return the "regularization" penalty for the weights
 **/
 Dense::SetParameters(newVW) {
-	bias[] = newVW[MyW0:MyW0+Dims[Nneurons]-1];
-	myvW[] = newVW[(MyW0+Dims[Nneurons]):(MyW0+NW-1)];
-	weights[][] = reshape(myvW,Dims[Ninputs],Dims[Nneurons]);
-	return  lambda>0.0   //only compute norm() if necessary
-			? lambda*(norm(myvW,1)+norm(bias,1))
-			: 0.0;
+	GP[] = newVW[MyW0:MyW0+NW-1];			//copy into scratch space my parameters
+	bias[] = GP[:Dims[Nneurons]-1];
+	weights[][] = reshape(GP[Dims[Nneurons]:.last], Dims[Ninputs], Dims[Nneurons] );
+	decl penalty;
+	if (lambda>0.0) { //only compute penalty  if necessary
+		penalty = lambda*(		
+				         norm(GP,1)					// sum of |x|
+					+sqr(norm(GP,2))        		// NNFS does not take square root, so square Euclidean norm
+					);
+		GP[] = lambda*(
+				(GP .> 0  .? 1.0 .:  -1.0)		// derivative of the absolute function penalty.  KINK at 0.0!
+				+ 2*GP						// derivative of sum of squares
+	    		);
+		}
+	else {										// no penalty or gradient
+		 penalty = 0.0;
+		 GP[] = 0.0;
+		}
+	return penalty;
 	}
 	
 /** Forward propogation.
@@ -63,14 +80,18 @@ Dense::Forward() {
 /** Back Propagation. 
 Compute gradients of weights then update B in the previous level
 to be used as forward part of gradient 
+
+This also adds the gradient of the penalty (if any)
 **/
 Dense::Backward() {
 	decl t;
-	for (GM[][] = 0.0, t=0 ;t<rows(inputs);++t) //aggregate across observations 
+
+	// aggregate across observations in the batch.  
+	for (GM[][] = 0.0, t=0 ; t<rows(inputs); ++t) 
 		GM += (1~inputs[t][])'*B[t][];			//1 is coeff on bias, 
 	if (isclass(prev)) // not the first layer so
 		prev.B[][] .*= B*weights';		//continue chain rule, multiply by weights' & previous layer's activation
-	return vecr(GM);   					// vectorize 
+	return vecr(GM)+GP;   			   // vectorize Jacobian matrix and add on the gradient from the penalty
 	}
 
 Dense::Plot() {

@@ -53,7 +53,7 @@ Network::AddLayers(...args) {
 		layers[.last].next = 0;  //last layer has no successor until built
 	}
 
-/** Set the Loss type, batch inputs and target outputs .
+/** Set the Loss type.
 @param LossType integer code for Loss
 @param batch TxN matrix of training data
 @param target TxM matrix of target outputs
@@ -63,34 +63,55 @@ The code then reuses these matrices (placing [][] ) to avoid new memory
 allocation.
 
 **/
-Network::SetBatchAndTarget(LossType,batch,target)	{
+Network::SetLoss(LossType)	{
+	if (isclass(Loss)) {
+		oxwarning("Loss function already set.  Updating it");
+		delete Loss;  //clean up
+		}
+	this.LossType = LossType;
+	switch_single(LossType) {
+		case NoLoss : Loss = new Loss();
+		case CELoss : Loss = new CrossEntropy();
+		case MSELoss : Loss = new MeanSquareError();
+		default : oxrunerror("Loss Type Invalid");
+		}
+	}
+
+/** Set the Loss type, batch inputs and target outputs .
+@param batch TxN matrix of training data
+@param target TxM matrix of target outputs
+
+This builds the network and initializes the dimensions of  matrices. 
+The code then reuses these matrices (placing [][] ) to avoid new memory 
+allocation.
+
+**/
+Network::SetBatchAndTarget(batch,target)	{
 	if (isbuilt)
-		oxrunerror("Network already built");
-	isbuilt = TRUE;
+		oxwarning("Network already built: resizing input and output");
+	if (!isclass(Loss)) 
+		oxrunerror("Set the Loss type using SetLoss() before setting batch and target.");
 	if (LossType!=NoLoss && rows(batch)!=rows(target))
 		oxrunerror("rows of batch and target must be equal");
 	if (columns(batch)!=layers[0].Dims[Ninputs])
 		oxrunerror("external batch input wrong dimension");
 	if (LossType!=NoLoss && rows(target)!=layers[.last].Dims[Nneurons])
 		oxwarning("rows of target not equal to neurons at top layer");
-	switch_single(LossType) {
-		case NoLoss : Loss = new Loss(target);
-		case CELoss : Loss = new CrossEntropy(target);
-		case MSELoss : Loss = new MeanSquareError(target);
-		default : oxrunerror("Loss Type Invalid");
-		}
+
 	/*Pre-populate inputs and outputs to avoid recreation of matrices*/
 	decl l;
 	layers[0].inputs = batch; 	// Make batch the inputs to the first layer
 	layers[.last].next = Loss;  // Make successor of last layer the loss
 	BatchSize = rows(batch);
-	Loss.B = zeros(BatchSize,layers[.last].Dims[Nneurons]);
+	Loss.SetTarget(target);
+	Loss.B = zeros(BatchSize,layers[.last].Dims[Nneurons]);			
 	foreach (l in layers) {
 		if (isclass(l,"Dropout"))
 			l.curdrops = ones(l.inputs);			//l,l.Dims[Nneurons]
 		l.B = l.next.inputs = zeros(rows(l.inputs),l.Dims[Nneurons]); 
 		}
 	grad = zeros(Nparams,1);
+	isbuilt = TRUE;
 	}
 
 /** Set all biases and weights in the network. 
@@ -104,10 +125,11 @@ It also computes the regulation penalty for the network.
 Network::SetParameters(vW) {
 	decl l;
 	penalty = 0.0;        //initialize penalty
-	foreach (l in layers)  
+	foreach (l in layers)  {
 		penalty += l->SetParameters(vW);
+		if (VOLUME) println("Cumulative Penalty:",penalty);
+		}
 }
-
 
 /**Forward propagate the network.**/	
 Network::Forward() {
@@ -193,10 +215,11 @@ Lobj(vW,aL,aG,aH) {
 
 /*------------------------------  Loss Functions  -------------------------------- */
 
-/** Base Loss function creator.
+
+/** Store the target for loss functions.
 @param target T x M matrix of target data
 **/
-Loss::Loss(target) {
+Loss::SetTarget(target) {
 	this.target = target;
 	}
 
@@ -205,12 +228,11 @@ Loss::value() {
 	return ;
 	}
 
-/** Create a mean squared error loss function.
-@param target T x M matrix of target data
-**/
-MeanSquareError::MeanSquareError(target) {
+/*  No need to replace the virtual target (for now)
+MeanSquareError::SetTarget(target) {
 	Loss(target);
 	}
+*/
 
 /** Compute MSE loss and initialize B.
 $$L = \sum_{t} {(y-\hat y)}^2 / 2.$$
@@ -226,8 +248,8 @@ MeanSquareError::value() {
 /** Create a CrossEntropy (multinomial logit) loss function.
 @param target T x M matrix of target data
 **/
-CrossEntropy::CrossEntropy(target) {
-	Loss(target);
+CrossEntropy::SetTarget(target) {
+	Loss::SetTarget(target);
 	J = maxc(target);								//number of classes
 	rng = range(0,rows(target)-1);					// 0...T-1:  used when computing value
 	targcol = reshape(range(0,J),rows(target),J+1);  // repeated rows 0 1 2 ... J-1		
@@ -252,9 +274,10 @@ CrossEntropy::value() {
 	
 /** 
 **/
-BinaryCrossEntropy::BinaryCrossEntropy(target) {
-	CrossEntropy(target);
+BinaryCrossEntropy::SetTarget(target) {
+	CrossEntropy::SetTarget(target);
 	}
+
 BinaryCrossEntropy::value() {
 	B[][] = (2*target-1).*inputs+(1-target);
 	loss = -sumc(log(B)); 
