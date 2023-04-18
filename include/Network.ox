@@ -2,11 +2,23 @@
 #include "Network.oxh"
 
 
-/** Create a new empty network. **/
-Network::Network() {
+/** Create a new empty network. 
+@param LossType integer code for loss type
+**/
+Network::Network(LossType) {
 	vLabels = layers = {};
 	VOLUME = isbuilt = Nlayers = Nparams = 0;
 	BACKPROPAGATION = TRUE;
+	this.LossType = LossType;
+	switch_single(LossType) {
+		case NoLoss : Loss = new Loss();
+		case BinaryCELoss : Loss = new BinaryCrossEntropy();
+		case CELoss : Loss = new CrossEntropy();
+		case MSELoss : Loss = new MeanSquareError();
+		case MAELoss : Loss = new MeanAbsoluteError();
+		default : oxrunerror("Loss Type Invalid");
+		}
+
 	}
 
 /** Add layers to the network.
@@ -53,36 +65,13 @@ Network::AddLayers(...args) {
 		layers[.last].next = 0;  //last layer has no successor until built
 	}
 
-/** Set the Loss type.
-@param LossType integer code for Loss
+
+
+/** Set  batch inputs and target outputs .
 @param batch TxN matrix of training data
 @param target TxM matrix of target outputs
 
-This builds the network and initializes the dimensions of  matrices. 
-The code then reuses these matrices (placing [][] ) to avoid new memory 
-allocation.
-
-**/
-Network::SetLoss(LossType)	{
-	if (isclass(Loss)) {
-		oxwarning("Loss function already set.  Updating it");
-		delete Loss;  //clean up
-		}
-	this.LossType = LossType;
-	switch_single(LossType) {
-		case NoLoss : Loss = new Loss();
-		case CELoss : Loss = new CrossEntropy();
-		case MSELoss : Loss = new MeanSquareError();
-		default : oxrunerror("Loss Type Invalid");
-		}
-	}
-
-/** Set the Loss type, batch inputs and target outputs .
-@param batch TxN matrix of training data
-@param target TxM matrix of target outputs
-
-This builds the network and initializes the dimensions of  matrices. 
-The code then reuses these matrices (placing [][] ) to avoid new memory 
+This builds the dimensions of  matrices. The code then reuses these matrices (placing [][] ) to avoid new memory 
 allocation.
 
 **/
@@ -228,11 +217,13 @@ Loss::value() {
 	return ;
 	}
 
-/*  No need to replace the virtual target (for now)
-MeanSquareError::SetTarget(target) {
-	Loss(target);
+/**  
+**/
+RegressionData::SetTarget(target) {
+	Loss::SetTarget(target);
+	accuracy_precision = sqrt(varc(target)) / 250;
 	}
-*/
+
 
 /** Compute MSE loss and initialize B.
 $$L = \sum_{t} {(y-\hat y)}^2 / 2.$$
@@ -242,6 +233,26 @@ B initialized as the gradient, (y-\hat y)
 MeanSquareError::value() {
 	B[][] = target-inputs';
 	loss = sumsqrc(B)/2.0;
+	if (Network::PREDICTING) {
+		//prediction =  ;
+		accuracy = double(meanc(fabs(B) < accuracy_precision));
+		}
+	return double(loss);
+	}
+
+/** Compute MSE loss and initialize B.
+$$L = \sum_{t} {(y-\hat y)}^2 / 2.$$
+B initialized as the gradient, (y-\hat y)
+@return L
+**/
+MeanAbsoluteError::value() {
+	B[][] = target-inputs';
+	loss = sumc(fabs(B));
+	if (Network::PREDICTING) {
+		//prediction =  ;
+		accuracy = double(meanc(fabs(B) < accuracy_precision));
+		}
+	B[][] = B .> 0 .? 1 .: 0 ;  // use element-by-element conditional assignment
 	return double(loss);
 	}
 
@@ -254,6 +265,7 @@ CrossEntropy::SetTarget(target) {
 	rng = range(0,rows(target)-1);					// 0...T-1:  used when computing value
 	targcol = reshape(range(0,J),rows(target),J+1);  // repeated rows 0 1 2 ... J-1		
 	targcol = target.==targcol;						//indicator that this column is the target
+	vL = zeros(rows(target),1);
 	}
 
 /** Compute MSE loss and initialize B.
@@ -261,14 +273,13 @@ CrossEntropy::SetTarget(target) {
 @return  L  
 **/
 CrossEntropy::value() {
-	vL =selectrc(inputs,rng,target)';		
-	B[][] = vL.*(targcol - inputs);			// Jacobian of objective
+	vL[] =selectrc(inputs,rng,target)';		
 	if (Network::PREDICTING) {
 		prediction = maxcindex(inputs');
 		accuracy = double(meanc(prediction'.==target));
 		}
-	loss = -sumc(log(vL));		//Don't average like NNFS, just sum
-	B[][] .*= -1.0 ./ vL;		// chain rule for sum of logs
+	loss = -sumc(log(vL));				//Don't average like NNFS, just sum
+	B[][] = -(targcol-inputs);			// Jacobian of objective. vL .* and ./ vL cancel out	
 	return double(loss);
 	}
 	
@@ -276,12 +287,18 @@ CrossEntropy::value() {
 **/
 BinaryCrossEntropy::SetTarget(target) {
 	CrossEntropy::SetTarget(target);
+	vL = zeros(target);
 	}
 
 BinaryCrossEntropy::value() {
-	B[][] = (2*target-1).*inputs+(1-target);
-	loss = -sumc(log(B)); 
-	B[][] = -(2.0*target-1)./ B;
+	vL[]  = target.*inputs + (1-target).*(1-inputs);
+	B[][] = -(target-inputs);
+	loss = -sumc(log(vL)); 
+	//println(loss,target~inputs);
+	if (Network::PREDICTING) {
+		prediction = inputs .> 0.5 ;
+		accuracy = double(meanc(prediction.==target));
+		}
 	return double(loss);
 	}
 

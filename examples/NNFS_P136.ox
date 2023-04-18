@@ -7,23 +7,19 @@ Replicate the code on Page 136 of NNFS usng NeurOx
 enum{Nk=100,Nn=2,K=3,Nh=3}   
 
 main() {
-    decl net,Xspiral,batch,target,layer0,layer1,W,bestW, bestL, trip;
-  	Xspiral = spiral(Nk,K);
-
-    target = Xspiral[][0];
-    batch = Xspiral[][1:];
-
+    decl net,batch,target,layer0,layer1,W,bestW, bestL, trip;
+  	
+    [target,batch] = spiral(Nk,K);         //creates a 300 x 3 input matrix.  The [a , b ]=f()  syntax is equivalent to Python a, b = f()
 
     layer0 = zeros(1,Nh)|0.01*rann(Nn,Nh);     //stack weights under bias
     layer1 = zeros(1,K)|0.01*rann(Nh,K);
     W = vecr(layer0)|vecr(layer1);        //vectorize all parameters (will be reshaped interally)
 
-    net = new Network();                        //create a network
+    net = new Network(CELoss);                                      // set Loss as Cross Entropy (multinomial logit));
 	net.AddLayers(
         new Dense(<Nn,Nh>,RecLinAct),      //add the RecLinAct layer
         new Dense(<Nh,K>,SoftAct)
         );
-    net.SetLoss(CELoss);                                // set Loss as Cross Entropy (multinomial logit)
 	net.SetBatchAndTarget(batch,target);        
     net.SetParameters(W);    
 	net->Forward();

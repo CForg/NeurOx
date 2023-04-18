@@ -8,19 +8,16 @@
 enum{Nk=100,Nn=2,K=3,Nh=3}   // Added Nh to name the number of hidden neurons (avoid more 3's in the code)
 
 main() {
-    decl net,Xspiral,batch,target;
-  	Xspiral = spiral(Nk,K);
+    decl net,batch,target;
+  	
+  	[target,batch] = spiral(Nk,K);         
 
-    target = Xspiral[][0];
-    batch = Xspiral[][1:2];
-
-    net = new Network();                        //create a network
+    net = new Network(CELoss);                                      // set Loss as Cross Entropy (multinomial logit));
 	  net.AddLayers   (
         new Dense(<Nn,Nh>,RecLinAct, 0.0, 0, 0.01*rann(Nn,Nh)),      //add the RecLinAct layer
         new Dense(<Nh,K>,SoftAct, 0.0, 0, 0.01*rann(Nh,K)  )        // and add 2nd layer
         );
 
-    net.SetLoss(CELoss);                                // set Loss as Cross Entropy (multinomial logit)
 	  net.SetBatchAndTarget(batch,target);                     
 
 	  net->VOLUME = TRUE;

@@ -1,7 +1,7 @@
 #import "Layers"
 #import <maximize>
 
-enum{NoLoss,BinaryCELoss,CELoss,MSELoss,NLossFunctions}
+enum{NoLoss,BinaryCELoss,CELoss,MSELoss,MAELoss,NLossFunctions}
 
 static decl net;   //object that holds the Network for passing info 
 
@@ -17,7 +17,7 @@ struct Loss {
 		/** top-leval activations.**/ inputs,
 		 							  prediction,
 		 							  accuracy;
-			SetTarget(target);
+	virtual SetTarget(target);
   	virtual value();
 	}
 
@@ -33,7 +33,16 @@ struct BinaryCrossEntropy : CrossEntropy {
 	SetTarget(target);
 	}	
 
-struct MeanSquareError : Loss {
+struct RegressionData  : Loss {
+	decl accuracy_precision;
+	virtual SetTarget(target);
+	}
+
+struct MeanSquareError : RegressionData {
+	value();
+	}
+	
+struct MeanAbsoluteError : RegressionData {
 	value();
 	}
 
@@ -54,12 +63,11 @@ struct Network  {
 		 grad,
 		 vLabels ;
 		 
-		 Network();
+		 Network(LossType=NoLoss);
 		 Obj(vW);
 		 AddLayers(...args);
 		 CrossEntropy();
 		 SetParameters(vW);
-		 SetLoss(LossType=NoLoss);
 		 SetBatchAndTarget(batch,target=0);
 		 Forward();
 		 Backward();

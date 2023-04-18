@@ -6,20 +6,16 @@
 
 enum{Nk=100,Nn=2,K=3}       // Can change the dimensions here, better than multiple "3s" in the code
 main() {
-    decl net,Xspiral,batch,target;
+    decl net,batch,target;
     
   	Xspiral = spiral(Nk,K);
-
-    target = Xspiral[][0];
-    batch = Xspiral[][1:2];
-   
-    net = new Network();                                                     //create a network
+    [target,batch] = spiral(Nk,K);         //creates a 300 x 3 input matrix.  The [a , b ]=f()  syntax is equivalent to Python a, b = f()
+  
+    net = new Network();                                                      //create a network object. Default Loss is "NoLoss" so no target required       
 	 
     net.AddLayers(new Dense(<Nn,3>,RecLinAct, 0.0, 0, 0.01*rann(Nn,3)) );    //add the RecLinAct layer,lambda=0.0, default bias, random weights
    
     net.AddLayers(new Dense(<3,K>,SoftAct,   0.0, 0, 0.01*rann(3,K) ));     // add the Softmax Act layer
-
-    net.SetLoss();                                                          // set Loss as "NoLoss" 
 	 
     net.SetBatchAndTarget(batch,target);                                  // feed in batch and target
 	 

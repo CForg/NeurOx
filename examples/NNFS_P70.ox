@@ -10,24 +10,21 @@
 enum{Nk=100,Nn=2,K=3}       // Can change the dimensions here, better than multiple "3s" in the code
 
 main() {
-    decl net,Xspiral,batch,target,bias,weights;     // declare all the variables used
-  	Xspiral = spiral(Nk,K);                        //creates a 300 x 3 input matrix (target and inputs in one matrix)
+    decl net,batch,target,bias,weights;     // declare all the variables used
+  	[target,batch] = spiral(Nk,K);         //creates a 300 x 3 input matrix.  The [a , b ]=f()  syntax is equivalent to Python a, b = f()
 
-    target = Xspiral[][0];                          //target (y) class is in the first column 
-    batch = Xspiral[][1:];                         //input is in 2nd and 3rd column
     bias = zeros(1,K);
     weights = 0.01*rann(Nn,K);                    // rann() is Ox's normal pRNG
 
-    net = new Network();                        //create a network
+    net = new Network();                        //create a network object. Default Loss is "NoLoss" so no target required       
 	  net.AddLayers(
         new Dense(<Nn,K>,LinAct,0.0,bias,weights)    // create and add Linear Act  layer, populate parameters
         );     
-  net.SetLoss();                                // set Loss as "NoLoss" so no target required       
-	net.SetBatchAndTarget(batch,target);        
-	net->VOLUME = TRUE;                                
-	net->Forward();                                    // Forward propagation of the network
-  println("Output of the layer:",
-          net.Loss.inputs[:5][]);                   // output stored as input to the next level (at the top, in Loss)
+	  net.SetBatchAndTarget(batch,target);        
+	  net->VOLUME = TRUE;                                
+	  net->Forward();                                    // Forward propagation of the network
+    println("Output of the layer:",
+            net.Loss.inputs[:5][]);                   // output stored as input to the next level (at the top, in Loss)
 
 }
 /** Should produce this output.  NOte the random number generator produces different weights than numpy

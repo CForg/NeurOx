@@ -172,5 +172,5 @@ $$z = f(y) = f(b+xA).$$
 Layer::SoftMax(output) 	{
 	decl ev = exp(output-maxr(output));
 	next.inputs[][] = ev ./ sumr(ev);
-	B[][] = next.inputs .* (1-next.inputs);  	//Not sure about this yet.
+	B[][] = next.inputs .* (1-next.inputs);  	//dF = F(1-F)
 	}	

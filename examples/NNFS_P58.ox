@@ -13,16 +13,15 @@ main() {
              -0.26, -0.27, 0.17, 0.87>;
     weights = weights';                         // Neurox stores Neurons as columns in weights, so take transpose of NNFS
     biases = <2.0, 3.0, 0.5>;                   // bias ROW vector
-    net = new Network();                        //create a network object
+    net = new Network();                        //create a network object. Default Loss is "NoLoss" so no target required       
 	net.AddLayers(
            new Dense(<4,3>,LinAct,0.0,biases,weights)    //add Linear Act layer, lambda=0.0, populate weights and bias 
            );
-    net.SetLoss();                                // set Loss as "NoLoss" so no target required       
 	net.SetBatchAndTarget(batch);                 //  feed in batch
 	net.Forward();
     println("Output of the layer:",net.Loss.inputs);    //oputs are always stored as inputs to the next level (in this case in Loss)
     }
-    
+
 /** Should produce this output
 <pre>
 Ox 9.06 (Windows_64/Parallel) (C) J.A. Doornik, 1994-2022 (oxlang.dev)
