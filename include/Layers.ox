@@ -4,6 +4,7 @@
 /**Return dimensions of a matrix as a 1x2 vector. **/
 Layer::Dimensions(A)   { return rows(A)~columns(A); }
 
+
 /** Create a dense layer in a neural network.
 @param dims =  <Ninputs,Nneurons> dimensions of the layer
 @param ActType integer code for the Activation
@@ -161,7 +162,7 @@ $$B = I_{z>0}$$
 **/
 Layer::RectLinear(output) {
 	next.inputs[][] = setbounds(output,0,.NaN);
-	B[][] = next.inputs.>0;
+	B[][] = next.inputs .> 0;
 	}
 
 /**SoftMax (Multinomial Logit) Activation.
@@ -171,6 +172,6 @@ $$z = f(y) = f(b+xA).$$
 **/
 Layer::SoftMax(output) 	{
 	decl ev = exp(output-maxr(output));
-	next.inputs[][] = ev ./ sumr(ev);
+	next.inputs[][] = (ev ./ sumr(ev));
 	B[][] = next.inputs .* (1-next.inputs);  	//dF = F(1-F)
 	}	

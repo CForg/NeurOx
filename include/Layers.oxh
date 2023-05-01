@@ -24,6 +24,8 @@ struct Layer {
 	virtual Backward();
 	virtual SetParameters(vW);
 	virtual Plot();
+//			GetInputs();
+//			SetInputs(x);
 	 		Linear(output);
 			Sigmoid(output);
 			RectLinear(output);

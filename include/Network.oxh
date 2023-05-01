@@ -72,6 +72,6 @@ struct Network  {
 		 Forward();
 		 Backward();
 		 Output();
-
+		 Train(opt,aW,batch,target,bsize=0);
 	}
 	

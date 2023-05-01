@@ -91,6 +91,7 @@ Network::SetBatchAndTarget(batch,target)	{
 	decl l;
 	layers[0].inputs = batch; 	// Make batch the inputs to the first layer
 	layers[.last].next = Loss;  // Make successor of last layer the loss
+	println("XXX ",classname(layers[.last].next));
 	BatchSize = rows(batch);
 	Loss.SetTarget(target);
 	Loss.B = zeros(BatchSize,layers[.last].Dims[Nneurons]);			
@@ -153,6 +154,34 @@ Network::Backward() {
 		}
 	}
 
+Network::Train(opt,aW,batch,target,bsize) {
+	decl s,t,Nsteps,rfirst,rlast;
+	if (!bsize) {
+		SetBatchAndTarget(batch,target);
+		Nsteps = 1;
+		}
+	else {
+		Nsteps = ceil(rows(batch)/bsize);
+		}
+	println("set");
+	for(t=0;t<100;++t) {
+		if(bsize) {
+			rfirst = 0;
+			rlast = bsize-1;
+			}
+		for (s=0;s<Nsteps;++s) {
+			if(bsize) {
+				SetBatchAndTarget(batch[rfirst:rlast],target[rfirst:rlast]);
+			opt->Iterate(aW);
+			if (bsize) {
+				rfirst = rlast+1;
+				rlast = min(rlast+bsize,rows(batch)-1);
+				}
+			}
+		}
+	}
+}
+
 /*------------------------------  Objective Functions  -------------------------------- */
 
 /** Objective function of the network: Loss + penalty.
@@ -161,8 +190,11 @@ Network::Backward() {
 
 **/
 Network::Obj(vW) {
+	println("in vW");
 	SetParameters(vW);			//populate new parameters
+	println("past SP");
 	Forward();				   //move forward
+	println("past forward");
 	return (floss + penalty);  //return overall objective
 	}
 

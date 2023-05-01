@@ -50,3 +50,7 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+#Fashion data
+*.png
+fashion_mnist_images.zip
