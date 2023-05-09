@@ -76,22 +76,19 @@ allocation.
 
 **/
 Network::SetBatchAndTarget(batch,target)	{
-	if (isbuilt)
-		oxwarning("Network already built: resizing input and output");
+	//if (isbuilt) oxwarning("Network already built: resizing input and output");
 	if (!isclass(Loss)) 
 		oxrunerror("Set the Loss type using SetLoss() before setting batch and target.");
 	if (LossType!=NoLoss && rows(batch)!=rows(target))
 		oxrunerror("rows of batch and target must be equal");
 	if (columns(batch)!=layers[0].Dims[Ninputs])
 		oxrunerror("external batch input wrong dimension");
-	if (LossType!=NoLoss && rows(target)!=layers[.last].Dims[Nneurons])
-		oxwarning("rows of target not equal to neurons at top layer");
+	// if (LossType!=NoLoss && rows(target)!=layers[.last].Dims[Nneurons]) oxwarning("rows of target not equal to neurons at top layer");
 
 	/*Pre-populate inputs and outputs to avoid recreation of matrices*/
 	decl l;
 	layers[0].inputs = batch; 	// Make batch the inputs to the first layer
 	layers[.last].next = Loss;  // Make successor of last layer the loss
-	println("XXX ",classname(layers[.last].next));
 	BatchSize = rows(batch);
 	Loss.SetTarget(target);
 	Loss.B = zeros(BatchSize,layers[.last].Dims[Nneurons]);			
@@ -155,7 +152,7 @@ Network::Backward() {
 	}
 
 Network::Train(opt,aW,batch,target,bsize) {
-	decl s,t,Nsteps,rfirst,rlast;
+	decl s,t,Nsteps,rfirst,rlast,L;
 	if (!bsize) {
 		SetBatchAndTarget(batch,target);
 		Nsteps = 1;
@@ -163,24 +160,29 @@ Network::Train(opt,aW,batch,target,bsize) {
 	else {
 		Nsteps = ceil(rows(batch)/bsize);
 		}
-	println("set");
+	println("set ",Nsteps," ",bsize);
+	opt->initalg(aW);
 	for(t=0;t<100;++t) {
+		print(".");
 		if(bsize) {
 			rfirst = 0;
 			rlast = bsize-1;
 			}
 		for (s=0;s<Nsteps;++s) {
 			if(bsize) {
-				SetBatchAndTarget(batch[rfirst:rlast],target[rfirst:rlast]);
-			opt->Iterate(aW);
+				SetBatchAndTarget(batch[rfirst:rlast][],target[rfirst:rlast]);
+				}
+	        L = Obj(aW[0]) ;  
+            Backward();
+			opt->step();
 			if (bsize) {
 				rfirst = rlast+1;
 				rlast = min(rlast+bsize,rows(batch)-1);
 				}
 			}
 		}
+    println("\ndone");
 	}
-}
 
 /*------------------------------  Objective Functions  -------------------------------- */
 
@@ -190,11 +192,8 @@ Network::Train(opt,aW,batch,target,bsize) {
 
 **/
 Network::Obj(vW) {
-	println("in vW");
 	SetParameters(vW);			//populate new parameters
-	println("past SP");
 	Forward();				   //move forward
-	println("past forward");
 	return (floss + penalty);  //return overall objective
 	}
 
@@ -326,7 +325,6 @@ BinaryCrossEntropy::value() {
 	vL[]  = target.*inputs + (1-target).*(1-inputs);
 	B[][] = -(target-inputs);
 	loss = -sumc(log(vL)); 
-	//println(loss,target~inputs);
 	if (Network::PREDICTING) {
 		prediction = inputs .> 0.5 ;
 		accuracy = double(meanc(prediction.==target));

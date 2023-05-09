@@ -25,7 +25,7 @@ main() {
         );
     net.SetBatchAndTarget(batch,target);        
     net.SetParameters(W); 
-    opt = new Adam(net,.02,1E-5);
+    opt = new RMSProp(net,1.0,1E-4);    //default eps and rho
     opt.itmax = 10000;
     opt.iterate(&W);
     net.PREDICTING = TRUE;

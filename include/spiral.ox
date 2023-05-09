@@ -24,7 +24,7 @@ spiral(N,K) {
 	  t = 4*(k+1)*r + 0.2*rann(N,1);   //no reason to recreate same range, reuse r
 	  xk = r.*(sin(t)~cos(t));
 	  DrawXMatrix(0,xk[][1]',"",xk[][0]',"",1,2+k);
-    y |= k;
+    y |= constant(k,N,1);
     X |= xk;
   	}
   DrawAxisAuto(0,0,1,ANCHOR_USER, 0.0, 0.0);  

@@ -25,7 +25,8 @@ main() {
         );
     net.SetBatchAndTarget(batch,target);        
     net.SetParameters(W); 
-    opt = new Adam(net,.02,1E-5);
+  //   opt = new BFGS(net);     MaxControl(1000,20); 
+    opt = new momSGD(net,1.0,1E-3,0.5);
     opt.itmax = 10000;
     opt.iterate(&W);
     net.PREDICTING = TRUE;
